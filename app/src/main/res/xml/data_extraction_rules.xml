@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude specific shared preferences that contain sensitive data -->
+        <exclude domain="sharedpref" path="redirections.xml"/>
+    </cloud-backup>
+    <device-transfer>
+        <!-- Exclude specific shared preferences that contain sensitive data -->
+        <exclude domain="sharedpref" path="redirections.xml"/>
+    </device-transfer>
+</data-extraction-rules> 

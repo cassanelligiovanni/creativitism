@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">App Redirector</string>
+    <string name="installed_apps">All Apps</string>
+    <string name="set_redirection">Set Redirection</string>
+    <string name="remove_redirection">Remove</string>
+    <string name="select_target_app">Select Target App</string>
+    <string name="redirection_set">Redirection set successfully</string>
+    <string name="redirection_removed">Redirection removed</string>
+    <string name="no_redirections">No redirections set</string>
+    <string name="current_redirections">Current Redirections</string>
+    <string name="redirects_to">redirects to</string>
+    <string name="enable_redirection_service">Enable Redirection Service</string>
+    <string name="permission_description">Requires "Usage Access" permission to detect when apps are opened. This app runs a service in the background to monitor launches.</string>
+</resources> 
