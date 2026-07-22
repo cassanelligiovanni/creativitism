@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permission to query installed packages -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" 
+    <!-- Permission to query installed packages (core feature: user picks apps to block) -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
     <!-- Permission required to check which app is in the foreground -->
@@ -12,47 +12,105 @@
 
     <!-- Permission required to run a service in the foreground -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <!-- Permission required to post notifications on Android 13+ -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-
+    <!-- Permission to launch the interstitial over blocked apps from the background -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Permission to start service on boot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Permission to request battery optimization exemption -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!-- Permission to wake up the device for service checks -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppRedirector"
-        tools:targetApi="31">
-        
+        android:theme="@style/Theme.Creativitism"
+        tools:targetApi="34">
+
         <!-- Main activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppRedirector">
+            android:theme="@style/Theme.Creativitism">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Full-screen pause shown when a blocked app is opened -->
+        <activity
+            android:name=".BlockedInterstitialActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.creativitism.appredirector.interstitial"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.Creativitism.Interstitial" />
+
         <!-- Invisible activity to proxy the redirection -->
         <activity
             android:name=".RedirectProxyActivity"
             android:theme="@style/Theme.Transparent"
+            android:excludeFromRecents="true"
             android:exported="false" />
-        
+
         <!-- Background service for monitoring app launches -->
         <service
             android:name=".RedirectorService"
             android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:foregroundServiceType="dataSync" />
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Digital-wellbeing app blocking: monitors the foreground app so the user's self-selected distracting apps can be intercepted and redirected to creative alternatives." />
+        </service>
+
+        <!-- Accessibility service for URL interception -->
+        <service
+            android:name=".UrlInterceptorService"
+            android:exported="false"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- Receiver to restart service on boot, power connected, and user present -->
+        <receiver
+            android:name=".ServiceRestartReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.POWER_CONNECTED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Receiver for periodic service health checks -->
+        <receiver
+            android:name=".ServiceKeepAliveManager$ServiceCheckReceiver"
+            android:enabled="true"
+            android:exported="false" />
 
     </application>
 
-</manifest> 
+</manifest>

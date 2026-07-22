@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Creativitism "ink glass" tokens (dark) -->
+
+    <color name="cv_paper_top">#2B2933</color>
+    <color name="cv_paper_mid">#211F28</color>
+    <color name="cv_paper_bottom">#17151C</color>
+    <color name="cv_surface">#1D1B24</color>
+
+    <color name="cv_ink">#EDEAE3</color>
+    <color name="cv_muted">#8D889C</color>
+
+    <color name="cv_teal">#3FD2C2</color>
+    <color name="cv_on_teal">#17151C</color>
+    <color name="cv_sienna">#E07A54</color>
+
+    <color name="cv_glass_hi">#1AFFFFFF</color>
+    <color name="cv_glass_lo">#0AFFFFFF</color>
+    <color name="cv_glass_stroke">#29FFFFFF</color>
+    <color name="cv_divider">#14FFFFFF</color>
+
+    <color name="cv_wash_teal">#2E3FD2C2</color>
+    <color name="cv_wash_apricot">#1AE07A54</color>
+
+    <color name="cv_button_bg">#EDEAE3</color>
+    <color name="cv_button_text">#17151C</color>
+
+    <color name="cv_frost_top">#D11A1820</color>
+    <color name="cv_frost_mid">#E518161E</color>
+    <color name="cv_frost_bottom">#F516141B</color>
+    <color name="cv_disc_top">#2B2933</color>
+    <color name="cv_disc_bottom">#211F28</color>
+    <color name="cv_ring_track">#26FFFFFF</color>
+
+    <color name="cv_error">#F2B8B5</color>
+    <color name="cv_on_error">#601410</color>
+</resources>

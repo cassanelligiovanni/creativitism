@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_frost"
+    tools:context=".BlockedInterstitialActivity">
+
+    <TextView
+        android:id="@+id/tildeMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/ibmplexserif_semibold"
+        android:includeFontPadding="false"
+        android:text="@string/tilde"
+        android:textColor="@color/cv_teal"
+        android:textSize="100sp"
+        app:layout_constraintBottom_toTopOf="@id/interstitialTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.30"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/interstitialTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/ibmplexserif_semibold"
+        android:text="@string/interstitial_title"
+        android:textColor="@color/cv_ink"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toTopOf="@id/blockedSubtitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tildeMark" />
+
+    <TextView
+        android:id="@+id/blockedSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/plex_serif"
+        android:gravity="center"
+        android:paddingHorizontal="32dp"
+        android:textColor="@color/cv_muted"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@id/countdownContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/interstitialTitle"
+        tools:text="You were opening Instagram." />
+
+    <FrameLayout
+        android:id="@+id/countdownContainer"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="44dp"
+        app:layout_constraintBottom_toTopOf="@id/redirectButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/blockedSubtitle">
+
+        <View
+            android:layout_width="136dp"
+            android:layout_height="136dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_ring_disc" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/countdownRing"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/cv_teal"
+            app:indicatorSize="150dp"
+            app:trackColor="@color/cv_ring_track"
+            app:trackCornerRadius="3dp"
+            app:trackThickness="7dp" />
+
+        <TextView
+            android:id="@+id/countdownText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/plex_serif"
+            android:textColor="@color/cv_ink"
+            android:textSize="56sp"
+            tools:text="10" />
+    </FrameLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/redirectButton"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="26dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/cv_button_bg"
+        android:text="@string/interstitial_redirect"
+        android:textColor="@color/cv_button_text"
+        android:textSize="16sp"
+        app:cornerRadius="28dp"
+        app:layout_constraintBottom_toTopOf="@id/allowButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/allowButton"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="26dp"
+        android:layout_marginBottom="44dp"
+        android:backgroundTint="@color/cv_glass_lo"
+        android:text="@string/interstitial_allow"
+        android:textColor="@color/cv_muted"
+        android:textSize="16sp"
+        app:cornerRadius="26dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@color/cv_muted" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

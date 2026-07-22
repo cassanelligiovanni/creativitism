@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Warm paper ground -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="300"
+                android:startColor="@color/cv_paper_top"
+                android:centerColor="@color/cv_paper_mid"
+                android:endColor="@color/cv_paper_bottom" />
+        </shape>
+    </item>
+    <!-- Teal wash, upper left -->
+    <item
+        android:width="420dp"
+        android:height="420dp"
+        android:gravity="top|start"
+        android:left="-140dp"
+        android:top="-60dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="210dp"
+                android:startColor="@color/cv_wash_teal"
+                android:endColor="#0078D6C9" />
+        </shape>
+    </item>
+    <!-- Apricot wash, mid right -->
+    <item
+        android:width="360dp"
+        android:height="360dp"
+        android:gravity="end"
+        android:right="-120dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="180dp"
+                android:startColor="@color/cv_wash_apricot"
+                android:endColor="#00F4BE8A" />
+        </shape>
+    </item>
+</layer-list>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Frosted sheet over the blocked app: slightly more transparent at the top,
+         warmer and more opaque toward the bottom (mock_dir_b_inter.html) -->
+    <gradient
+        android:angle="270"
+        android:startColor="@color/cv_frost_top"
+        android:centerColor="@color/cv_frost_mid"
+        android:endColor="@color/cv_frost_bottom" />
+</shape>

@@ -1,15 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">App Redirector</string>
-    <string name="installed_apps">All Apps</string>
-    <string name="set_redirection">Set Redirection</string>
-    <string name="remove_redirection">Remove</string>
-    <string name="select_target_app">Select Target App</string>
-    <string name="redirection_set">Redirection set successfully</string>
-    <string name="redirection_removed">Redirection removed</string>
-    <string name="no_redirections">No redirections set</string>
-    <string name="current_redirections">Current Redirections</string>
-    <string name="redirects_to">redirects to</string>
-    <string name="enable_redirection_service">Enable Redirection Service</string>
-    <string name="permission_description">Requires "Usage Access" permission to detect when apps are opened. This app runs a service in the background to monitor launches.</string>
-</resources> 
+    <string name="app_name">Creativitism</string>
+    <string name="app_tagline">trade doomscrolling for creating</string>
+    <string name="app_icon_description">App icon</string>
+    <string name="tilde" translatable="false">~</string>
+
+    <!-- Protection card -->
+    <string name="protection_title">Protection</string>
+    <string name="protection_on">blocked apps pause you first</string>
+    <string name="protection_off">off — everything opens freely</string>
+    <string name="enable_website_blocking">Turn on website blocking</string>
+    <string name="website_blocking_active">Website blocking is on</string>
+
+    <!-- Lists -->
+    <string name="soul_sucking_title">Blocked</string>
+    <string name="soul_sucking_subtitle">Apps and sites that eat your time</string>
+    <string name="creativity_boosting_title">Creative</string>
+    <string name="creativity_boosting_subtitle">Where we send you instead</string>
+    <string name="all_apps_title">Your apps</string>
+    <string name="all_apps_subtitle">Send any app to Blocked or Creative</string>
+    <string name="search_apps_hint">Search apps</string>
+    <string name="empty_blocked">Nothing blocked yet — add the apps that pull you in.</string>
+    <string name="empty_creative">Add at least one app or site you\'d rather open.</string>
+    <string name="add_website">Block a website</string>
+    <string name="add_creative_website">Add a creative site</string>
+    <string name="remove_item">Remove from list</string>
+    <string name="add_to_creative">Add to Creative</string>
+    <string name="add_to_blocked">Add to Blocked</string>
+
+    <!-- Dialogs -->
+    <string name="add_blocked_website_title">Block a website</string>
+    <string name="add_creative_website_title">Add a creative site</string>
+    <string name="add_website_dialog_message">Enter a domain (like instagram.com). Every page on it will be caught.</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="grant">Grant</string>
+    <string name="permission_usage_title">Allow usage access</string>
+    <string name="permission_description">Creativitism needs Usage access to notice when a blocked app opens. It only looks at which app is in the foreground — nothing else.</string>
+    <string name="permission_overlay_title">Allow display over other apps</string>
+    <string name="permission_overlay_description">This lets Creativitism show the pause screen on top of a blocked app.</string>
+    <string name="permission_notifications_needed">Notifications keep the protection service visible and alive.</string>
+    <string name="battery_dialog_title">Keep protection running</string>
+    <string name="battery_dialog_message">To keep protection reliable, exclude Creativitism from battery optimization. Otherwise Android may quietly stop it.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="skip">Skip</string>
+    <string name="service_started">Protection is on</string>
+    <string name="service_stopped">Protection is off</string>
+    <string name="accessibility_find_hint">Find “Creativitism” in the list and turn it on.</string>
+
+    <!-- Accessibility service (prominent disclosure — Play policy) -->
+    <string name="accessibility_service_label">Creativitism website blocking</string>
+    <string name="accessibility_disclosure_title">Website blocking uses accessibility</string>
+    <string name="accessibility_disclosure">Creativitism uses Android\'s AccessibilityService API to read the web address shown in your browser\'s address bar. This is only used to check the address against your own blocked list and pause the page when it matches.\n\nCreativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings.</string>
+    <string name="accessibility_disclosure_accept">I understand, continue</string>
+
+    <!-- Interstitial -->
+    <string name="interstitial_title">Take a breath.</string>
+    <string name="interstitial_subtitle">You were opening %1$s.</string>
+    <string name="interstitial_subtitle_generic">You were opening a blocked app.</string>
+    <string name="interstitial_redirect">Take me somewhere better</string>
+    <string name="interstitial_allow">Use it for 5 minutes</string>
+
+    <!-- Foreground service notification -->
+    <string name="notification_channel_name">Protection service</string>
+    <string name="notification_channel_description">Keeps watch for blocked apps</string>
+    <string name="notification_title">Creativitism is protecting you</string>
+    <string name="notification_text">Blocked apps will pause before opening.</string>
+</resources>
