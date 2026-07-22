@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Creativitism</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper-top:#F4F0E7; --paper-bot:#E0D8C4; --ink:#26241D;
+    --muted:#7D7666; --teal:#0B8A7D; --sienna:#B4552D;
+    --glass:rgba(255,255,255,.55); --stroke:rgba(255,255,255,.9);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'IBM Plex Serif',serif;color:var(--ink);line-height:1.6;
+    background:linear-gradient(160deg,var(--paper-top),var(--paper-bot));
+    background-attachment:fixed;min-height:100vh;padding:48px 20px;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+  .card{
+    background:var(--glass);border:1px solid var(--stroke);border-radius:24px;
+    box-shadow:0 20px 50px -24px rgba(70,58,25,.4);
+    backdrop-filter:blur(8px);padding:44px 40px;
+  }
+  .brand{font-size:34px;font-weight:700;letter-spacing:-.01em}
+  .brand span{color:var(--teal)}
+  h1{font-size:26px;font-weight:600;margin:6px 0 4px}
+  .eff{font-style:italic;color:var(--muted);margin-bottom:8px}
+  .lede{font-family:'IBM Plex Sans',sans-serif;background:rgba(255,255,255,.4);
+    border-left:4px solid var(--teal);border-radius:10px;padding:14px 18px;margin:20px 0}
+  h2{font-size:20px;font-weight:600;margin:32px 0 8px;padding-top:14px;border-top:1px solid rgba(125,118,102,.25)}
+  h3{font-size:16px;font-weight:600;margin:20px 0 4px;color:var(--ink)}
+  p{margin:10px 0}
+  ul{margin:10px 0 10px 22px}
+  li{margin:5px 0}
+  blockquote{font-style:italic;color:var(--muted);border-left:3px solid var(--muted);
+    margin:14px 0;padding:6px 16px}
+  code{font-family:'IBM Plex Sans',monospace;background:rgba(11,138,125,.10);
+    color:var(--teal);padding:1px 6px;border-radius:6px;font-size:.9em}
+  a{color:var(--teal)}
+  .contact{font-weight:600}
+  footer{text-align:center;color:var(--muted);font-style:italic;margin-top:26px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="brand">Creativitism<span>~</span></div>
+    <h1>Privacy Policy</h1>
+    <p class="eff">Effective date: July 22, 2026</p>
+    <p>This policy applies to the Creativitism Android app (package name <code>com.creativitism.appredirector</code>). It is written in plain language on purpose. If anything here is unclear, contact us using the address at the bottom.</p>
+
+    <div class="lede"><strong>The short version:</strong> Creativitism does not collect, transmit, store remotely, share, or sell any of your data. Everything the app knows about you stays on your device. There is no account, no server, no analytics, and no advertising in this app.</div>
+
+    <h2>What Creativitism does</h2>
+    <p>Creativitism lets you mark apps and websites as either "Blocked" (things you'd rather spend less time on) or "Creative" (things you'd rather spend time on instead). When you open something on your Blocked list, the app shows a full-screen pause for ten seconds, after which you can choose to be redirected to something on your Creative list, or continue to the blocked app or site for five minutes before being paused again.</p>
+
+    <h2>Information we store</h2>
+    <p>The only information Creativitism stores is the information you put into it directly: the list of apps and websites you've marked as Blocked, and the list you've marked as Creative. This is stored using Android's <code>SharedPreferences</code> mechanism, which writes a file in the app's private storage area on your device.</p>
+    <p>This data:</p>
+    <ul>
+      <li>Never leaves your device.</li>
+      <li>Is not transmitted to us, to the app's developer, or to any third party.</li>
+      <li>Is not backed up to any server we control (standard Android/Google device backup, if you have it enabled at the OS level, is controlled by you and Google, not by this app).</li>
+      <li>Is not linked to your identity, an account, or an advertising ID, because none of those exist in this app.</li>
+    </ul>
+
+    <h2>Permissions the app uses, and exactly why</h2>
+    <p>Creativitism requests a small number of Android permissions. Each one exists for a single, narrow purpose. None are used to collect data about you for any purpose other than the immediate on-device function described.</p>
+
+    <h3>Usage Access (<code>PACKAGE_USAGE_STATS</code>)</h3>
+    <p>Used solely to detect which app is currently in the foreground, so Creativitism can tell whether you've just opened something on your Blocked list. The check happens locally, in real time; the app does not log, store, or transmit your app usage history. A decision is made (pause or don't pause) and nothing about it is retained beyond that immediate decision.</p>
+
+    <h3>Accessibility Service</h3>
+    <p>Creativitism includes an optional Android <code>AccessibilityService</code>, used solely to read the web address currently shown in your browser's address bar (specifically, Chrome), so the app can compare that address against the website list you've built in the Blocked section. This is the only thing the service reads — it does not read page content, form fields, passwords, or anything else on screen, and it does not read any app other than the browser.</p>
+    <p>The comparison happens entirely on your device. The URL being checked is not collected, stored, or shared. It's read, compared against your own local blocklist, and discarded.</p>
+    <blockquote>"Creativitism uses Android's AccessibilityService API to read the web address shown in your browser's address bar. This is only used to check the address against your own blocked list and pause the page when it matches. Creativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings."</blockquote>
+    <p>You can disable this at any time in Android Settings → Accessibility. Website blocking will stop until you turn it back on; app blocking does not depend on this permission.</p>
+
+    <h3>Query All Packages (<code>QUERY_ALL_PACKAGES</code>)</h3>
+    <p>Used solely to show you the list of apps installed on your device, so you can choose which ones to add to your Blocked or Creative lists. It does not give the app access to those apps' data; the list is only ever displayed to you, inside the app.</p>
+
+    <h3>Foreground Service (<code>FOREGROUND_SERVICE</code>, <code>FOREGROUND_SERVICE_SPECIAL_USE</code>)</h3>
+    <p>Used to run the foreground-app detection reliably. The associated notification ("Creativitism is protecting you") exists because Android requires foreground services to show one; it does not send or receive any data.</p>
+
+    <h3>Notifications (<code>POST_NOTIFICATIONS</code>)</h3>
+    <p>Used only to show the persistent "protection is on" status notification and local, on-device alerts. No push notifications are received from a server, because Creativitism has no server.</p>
+
+    <h3>Display over other apps (<code>SYSTEM_ALERT_WINDOW</code>)</h3>
+    <p>Used to show the "Take a breath" pause screen on top of a blocked app. Purely a UI mechanism; involves no data collection.</p>
+
+    <h3>Boot / battery / wake (<code>RECEIVE_BOOT_COMPLETED</code>, <code>REQUEST_IGNORE_BATTERY_OPTIMIZATIONS</code>, <code>WAKE_LOCK</code>)</h3>
+    <p>Used to restart the protection service after your device reboots and to keep it running reliably. Operational permissions with no data-collection function.</p>
+
+    <h2>What we don't do</h2>
+    <ul>
+      <li>We don't collect analytics of any kind (no Firebase Analytics, no crash reporting SDK, no third-party SDKs at all).</li>
+      <li>We don't show ads or include any ad SDK.</li>
+      <li>We don't require or offer an account, login, or sign-in.</li>
+      <li>We don't have a backend server. The app makes no network calls.</li>
+      <li>We don't share, sell, rent, or disclose any information to third parties, because we don't collect any.</li>
+      <li>We don't use cookies, tracking device identifiers, or advertising IDs.</li>
+    </ul>
+
+    <h2>Children's privacy</h2>
+    <p>Creativitism is not directed at children and does not knowingly collect information from anyone, including children, because it does not collect information from anyone at all.</p>
+
+    <h2>Your choices and data deletion</h2>
+    <ul>
+      <li>To remove an item from a list, remove it in the app.</li>
+      <li>To erase everything the app has stored, go to Android Settings → Apps → Creativitism → Storage → Clear data, or uninstall the app. Either action permanently deletes the app's local data; since nothing is stored anywhere else, this is a complete deletion.</li>
+      <li>There is no remote account or server-side record to separately request deletion of, because none exists.</li>
+    </ul>
+
+    <h2>Changes to this policy</h2>
+    <p>If this policy changes — for example, if a future version adds a feature that changes what data is read — we will update this document and change the effective date above.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy or the app's data practices can be sent to:</p>
+    <p class="contact">your-contact-email@example.com</p>
+    <p style="color:var(--sienna);font-size:14px;font-style:italic">Replace the address above with a real, monitored inbox before publishing — Google Play requires the privacy policy to include a way to contact the developer.</p>
+  </div>
+  <footer>Creativitism~ · trade doomscrolling for creating</footer>
+</div>
+</body>
+</html>
