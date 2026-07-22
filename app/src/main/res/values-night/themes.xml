@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Colors switch via values-night/colors.xml; only window flags differ here -->
-    <style name="Theme.Creativitism" parent="Base.Theme.Creativitism">
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
-</resources>
