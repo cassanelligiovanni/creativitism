@@ -92,6 +92,4 @@ If this policy changes — for example, if a future version of the app adds a fe
 
 Questions about this policy or the app's data practices can be sent to:
 
-**[your-contact-email@example.com]**
-
-Replace the address above with a real, monitored inbox before publishing this policy or submitting the app to Google Play — Play requires the privacy policy to include a way to contact the developer.
+**cassanelligiovannia@gmail.com**
