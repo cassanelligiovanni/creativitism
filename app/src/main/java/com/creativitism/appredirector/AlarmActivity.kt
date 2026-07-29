@@ -37,6 +37,17 @@ class AlarmActivity : AppCompatActivity() {
         @Volatile
         var isShowing: Boolean = false
             private set
+
+        @Volatile
+        private var current: AlarmActivity? = null
+
+        /**
+         * Mid-alarm dormancy: finish without granting and stop audio.
+         * Must be invoked on the main thread.
+         */
+        internal fun dismissIfShowingForDormant() {
+            current?.dismissForDormant()
+        }
     }
 
     private lateinit var binding: ActivityAlarmBinding
@@ -55,6 +66,7 @@ class AlarmActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAlarmBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        current = this
 
         allowanceManager = TemporaryAllowanceManager(this)
         redirectionManager = RedirectionManager(this)
@@ -76,6 +88,14 @@ class AlarmActivity : AppCompatActivity() {
         })
 
         handleIntent(intent)
+    }
+
+    /** Schedule flipped dormant while alarm was showing — leave without a grant. */
+    private fun dismissForDormant() {
+        countDownTimer?.cancel()
+        pulseAnimator?.cancel()
+        audio.stop()
+        finish()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -221,6 +241,7 @@ class AlarmActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (current === this) current = null
         super.onDestroy()
         countDownTimer?.cancel()
         pulseAnimator?.cancel()

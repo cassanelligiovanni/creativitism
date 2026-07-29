@@ -74,4 +74,5 @@
     <string name="notification_channel_description">Keeps watch for blocked apps</string>
     <string name="notification_title">Creativitism is protecting you</string>
     <string name="notification_text">Blocked apps will pause before opening.</string>
+    <string name="notification_text_dormant">dormant — protection resumes at %1$s</string>
 </resources>

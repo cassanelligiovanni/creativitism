@@ -59,4 +59,12 @@ class TemporaryAllowanceManager(
     fun clear(packageName: String) {
         prefs.edit().remove(packageName).apply()
     }
+
+    /** Clears only a visit-scoped allowance; leaves strict timed grants alone. */
+    fun clearIfVisitScoped(packageName: String) {
+        val expiry = prefs.getLong(packageName, AllowancePolicy.NO_ALLOWANCE)
+        if (AllowancePolicy.isVisitScoped(expiry)) {
+            prefs.edit().remove(packageName).apply()
+        }
+    }
 }

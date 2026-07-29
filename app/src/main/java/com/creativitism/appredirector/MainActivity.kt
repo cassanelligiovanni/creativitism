@@ -66,6 +66,9 @@ class MainActivity : AppCompatActivity() {
 
         soulSuckingAdapter = ManagedItemsAdapter(emptyList()) { item ->
             redirectionManager.removeSoulSuckingItem(item.id)
+            BlockedItemPolicyStore(this).remove(item.id)
+            TemporaryAllowanceManager(this).clear(item.id)
+            VisitTracker(this).endVisit(item.id)
             loadAllData()
         }
         binding.soulSuckingRecyclerView.adapter = soulSuckingAdapter

@@ -9,24 +9,32 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import kotlinx.coroutines.*
+import java.time.LocalDateTime
 
 class RedirectorService : Service() {
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     private lateinit var redirectionManager: RedirectionManager
     private lateinit var appListManager: AppListManager
     private lateinit var allowanceManager: TemporaryAllowanceManager
+    private lateinit var visitTracker: VisitTracker
+    private lateinit var scheduleStore: ScheduleStore
+    private lateinit var settingsStore: AppSettingsStore
 
     // Last time (elapsedRealtime) the alarm was launched, per package.
     private val alarmLaunchedAt = mutableMapOf<String, Long>()
+    private var lastNotificationText: String? = null
 
     companion object {
         const val NOTIFICATION_ID = 1
@@ -42,11 +50,14 @@ class RedirectorService : Service() {
         redirectionManager = RedirectionManager(this)
         appListManager = AppListManager(this)
         allowanceManager = TemporaryAllowanceManager(this)
+        visitTracker = VisitTracker(this)
+        scheduleStore = ScheduleStore(this)
+        settingsStore = AppSettingsStore(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
-        val notification = createNotification()
+        val notification = createNotification(getString(R.string.notification_text))
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
@@ -77,22 +88,54 @@ class RedirectorService : Service() {
     // Runs every tick (not only on foreground changes) so an expired 5-minute
     // allowance kicks the user out even while they stay inside the blocked app.
     private fun checkForegroundApp() {
-        // Usage stats lag behind for a few seconds after the alarm covers a
-        // blocked app; relaunching it would restart the countdown.
-        if (AlarmActivity.isShowing) return
-        val foregroundApp = getForegroundApp() ?: return
-        if (foregroundApp == packageName) return
-        if (!redirectionManager.isSoulSucking(foregroundApp)) return
-        if (allowanceManager.isAllowed(foregroundApp)) return
+        val wallNow = System.currentTimeMillis()
+        val localNow = LocalDateTime.now()
+        val minuteOfDay = localNow.hour * 60 + localNow.minute
+        val weekdayMonday0 = localNow.dayOfWeek.value - 1
+        val schedule = scheduleStore.load()
+        val armed = SchedulePolicy.isArmed(schedule, minuteOfDay, weekdayMonday0)
+        val resumeLabel = SchedulePolicy.nextResumeLabel(schedule, minuteOfDay, weekdayMonday0)
+        updateNotification(armed, resumeLabel)
+
+        if (AlarmActivity.isShowing) {
+            if (!armed) {
+                mainHandler.post { AlarmActivity.dismissIfShowingForDormant() }
+            }
+            return
+        }
+
+        val foreground = getForegroundApp() ?: return
+
+        if (redirectionManager.getCreativityBoostingItems().contains(foreground)) {
+            settingsStore.lastCreativeItem = foreground
+        }
+
+        for (id in visitTracker.openVisitIds()) {
+            if (id == foreground) {
+                visitTracker.touch(id, wallNow)
+            } else if (!visitTracker.isVisitOpen(id, wallNow)) {
+                visitTracker.endVisit(id)
+            }
+        }
+
+        if (!armed) return
+        if (foreground == packageName) return
+        if (!redirectionManager.isSoulSucking(foreground)) return
+        if (allowanceManager.isAllowed(
+                foreground,
+                wallNow,
+                visitStillOpen = visitTracker.isVisitOpen(foreground, wallNow),
+            )
+        ) return
 
         val now = SystemClock.elapsedRealtime()
-        val lastLaunch = alarmLaunchedAt[foregroundApp] ?: 0L
+        val lastLaunch = alarmLaunchedAt[foreground] ?: 0L
         if (now - lastLaunch < ALARM_DEBOUNCE_MILLIS) return
-        alarmLaunchedAt[foregroundApp] = now
+        alarmLaunchedAt[foreground] = now
 
         val alarmIntent = Intent(this, AlarmActivity::class.java).apply {
-            putExtra(AlarmActivity.EXTRA_BLOCKED_ITEM, foregroundApp)
-            putExtra(AlarmActivity.EXTRA_DISPLAY_NAME, resolveDisplayName(foregroundApp))
+            putExtra(AlarmActivity.EXTRA_BLOCKED_ITEM, foreground)
+            putExtra(AlarmActivity.EXTRA_DISPLAY_NAME, resolveDisplayName(foreground))
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         startActivity(alarmIntent)
@@ -126,10 +169,26 @@ class RedirectorService : Service() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun createNotification(): Notification {
+    private fun updateNotification(armed: Boolean, resumeLabel: String?) {
+        val text = if (armed) {
+            getString(R.string.notification_text)
+        } else {
+            getString(
+                R.string.notification_text_dormant,
+                resumeLabel ?: "--:--",
+            )
+        }
+        if (text == lastNotificationText) return
+        lastNotificationText = text
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(NOTIFICATION_ID, createNotification(text))
+    }
+
+    private fun createNotification(contentText: String): Notification {
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(getString(R.string.notification_title))
-            .setContentText(getString(R.string.notification_text))
+            .setContentText(contentText)
             .setSmallIcon(R.drawable.ic_tilde)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
@@ -163,4 +222,4 @@ class RedirectorService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
-} 
+}
