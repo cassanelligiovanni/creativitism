@@ -28,6 +28,7 @@ Replace the calm “Take a breath.” pause with an aversive full-screen fire al
 | Empty Creative list | Escape silences alarm and leaves the blocked item (home) |
 | Active hours | Always-on by default; when set, enforce only inside window |
 | Flash rate | Below 3 Hz (target ≤ 2.5 flashes/second) |
+| Mute / silent | Play on alarm stream (survives media mute); if inaudible → aggressive vibration for the whole countdown |
 | Debounce | Keep existing ~3s per-item interstitial debounce; never stack/re-trigger while alarm is showing |
 
 ---
@@ -139,8 +140,9 @@ Escape/give-in for domains: escape opens Creative item; give-in grants domain al
 - Full-screen opaque (no peeking at blocked content through frost)
 - Background pulses deep red ↔ bright red, synced to alarm rhythm, ≤ 2.5 Hz
 - Typography: huge **STOP.**; “You were opening {name}.”; giant countdown 10→0 with sub-second progress
-- `AlarmAudioController`: `AudioAttributes.USAGE_ALARM` stream, looping klaxon from `res/raw/alarm_klaxon` (short generated tone loop checked into the repo; ToneGenerator fallback only if MediaPlayer fails), volume escalates over 10s; vibration pattern runs with it
-- No mute control inside the alarm UI; device volume still applies (platform limit — state honestly in store docs)
+- `AlarmAudioController`: `AudioAttributes.USAGE_ALARM` stream (separate from media — still audible when the user has only muted music/video), looping klaxon from `res/raw/alarm_klaxon` (short generated tone loop checked into the repo; ToneGenerator fallback only if MediaPlayer fails), volume escalates over 10s on the **alarm** stream; vibration pattern runs with it
+- **Mute / silent handling:** Prefer sound via the alarm stream so a muted media volume does not silence the intervention. Before/during playback, if alarm stream volume is 0, playback fails, or the device is in a state where alarm audio will not be heard, run an **aggressive vibration pattern for the whole countdown** (and keep vibrating on give-in wait) so the intervention is never silent-and-still. Do not request DND-bypass or notification-policy privileges solely to force speaker output — stay within normal app capabilities; document that total silence + vibration-only is possible if the user has zeroed alarm volume / blocked alarms in system settings
+- No mute control inside the alarm UI
 
 **Exit paths:**
 
@@ -218,7 +220,8 @@ Force dark look (replace current `MODE_NIGHT_NO` light glass theme).
 | Schedule flips to dormant mid-alarm | Finish alarm without granting; stop audio (user is outside enforcement) |
 | Domain block while Chrome in foreground | Same alarm; give-in returns to Chrome |
 | Strict timer expires mid-use | Immediate re-alarm next poll |
-| Device volume at zero | Visual+vibe still fire; cannot boost above user volume without policy abuse — accept platform limit |
+| Device media muted | Alarm stream still plays (USAGE_ALARM); vibration always runs with the alarm |
+| Alarm volume at zero / playback inaudible | Aggressive full-countdown vibration; no attempt to override DND with special privileges |
 
 ### Testing strategy
 
