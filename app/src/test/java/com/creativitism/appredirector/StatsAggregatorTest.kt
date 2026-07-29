@@ -54,6 +54,30 @@ class StatsAggregatorTest {
     }
 
     @Test
+    fun `default omitted boughtMillis on gave in counts as strict five minutes`() {
+        val today = LocalDate.of(2026, 7, 29)
+        val events = listOf(
+            InterventionEvent.strictGiveIn(dayStart(today), "com.example.app", "Example"),
+        )
+
+        val snapshot = StatsAggregator.aggregate(events, today, zone)
+
+        assertEquals(AllowancePolicy.ALLOWANCE_MILLIS, snapshot.boughtMillis)
+    }
+
+    @Test
+    fun `visit deferred gave in still breaks streak`() {
+        val today = LocalDate.of(2026, 7, 29)
+        val events = listOf(
+            InterventionEvent.visitDeferredGiveIn(dayStart(today), "com.example.app", "Example"),
+        )
+
+        val snapshot = StatsAggregator.aggregate(events, today, zone)
+
+        assertEquals(0, snapshot.giveInFreeStreakDays)
+    }
+
+    @Test
     fun `once per visit gave in contributes zero until visit bought`() {
         val today = LocalDate.of(2026, 7, 29)
         val events = listOf(
