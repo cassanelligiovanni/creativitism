@@ -55,6 +55,7 @@ class AlarmActivity : AppCompatActivity() {
     private lateinit var redirectionManager: RedirectionManager
     private lateinit var policyStore: BlockedItemPolicyStore
     private lateinit var interventionLog: InterventionLog
+    private lateinit var visitTracker: VisitTracker
     private lateinit var audio: AlarmAudioController
 
     private var countDownTimer: CountDownTimer? = null
@@ -72,6 +73,7 @@ class AlarmActivity : AppCompatActivity() {
         redirectionManager = RedirectionManager(this)
         policyStore = BlockedItemPolicyStore(this)
         interventionLog = InterventionLog(this)
+        visitTracker = VisitTracker(this)
         audio = AlarmAudioController(this)
 
         startPulse()
@@ -133,8 +135,13 @@ class AlarmActivity : AppCompatActivity() {
             // Task 15 wires the actual confession flow; for now this is a disabled placeholder.
             getString(R.string.alarm_givein_confession_placeholder)
         } else {
-            getString(R.string.alarm_givein_strict)
+            giveInLabel(policy.enforcementMode)
         }
+    }
+
+    private fun giveInLabel(mode: EnforcementMode): String = when (mode) {
+        EnforcementMode.STRICT -> getString(R.string.alarm_givein_strict)
+        EnforcementMode.ONCE_PER_VISIT -> getString(R.string.alarm_givein_visit)
     }
 
     private fun startCountdown(item: String) {
@@ -199,9 +206,20 @@ class AlarmActivity : AppCompatActivity() {
     private fun giveIn() {
         val item = blockedItem ?: return
         audio.stop()
-        allowanceManager.grantStrict(item)
         val now = System.currentTimeMillis()
-        interventionLog.append(InterventionEvent.strictGiveIn(now, item, displayName))
+        val policy = policyStore.get(item)
+        when (policy.enforcementMode) {
+            EnforcementMode.STRICT -> {
+                allowanceManager.grantStrict(item, now)
+                interventionLog.append(InterventionEvent.strictGiveIn(now, item, displayName))
+            }
+            EnforcementMode.ONCE_PER_VISIT -> {
+                allowanceManager.grantVisit(item)
+                visitTracker.touch(item, now)
+                visitTracker.markVisitGrantStarted(item, now)
+                interventionLog.append(InterventionEvent.visitDeferredGiveIn(now, item, displayName))
+            }
+        }
         interventionLog.append(
             InterventionEvent(
                 timestamp = now,

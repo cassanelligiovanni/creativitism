@@ -70,6 +70,7 @@
     <string name="alarm_subtitle_generic">You were opening a blocked app.</string>
     <string name="alarm_escape">Escape</string>
     <string name="alarm_givein_strict">Use it for 5 minutes</string>
+    <string name="alarm_givein_visit">Use it this visit</string>
     <string name="alarm_givein_confession_placeholder">Say the trade…</string>
 
     <!-- Foreground service notification -->
