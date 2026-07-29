@@ -1,12 +1,20 @@
 package com.creativitism.appredirector
 
+import android.Manifest
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import android.view.animation.LinearInterpolator
+import android.view.inputmethod.EditorInfo
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.creativitism.appredirector.databinding.ActivityAlarmBinding
@@ -56,12 +64,28 @@ class AlarmActivity : AppCompatActivity() {
     private lateinit var policyStore: BlockedItemPolicyStore
     private lateinit var interventionLog: InterventionLog
     private lateinit var visitTracker: VisitTracker
+    private lateinit var settingsStore: AppSettingsStore
     private lateinit var audio: AlarmAudioController
 
     private var countDownTimer: CountDownTimer? = null
     private var pulseAnimator: ValueAnimator? = null
     private var blockedItem: String? = null
     private var displayName: String = ""
+
+    private var expectedConfession: String? = null
+    private var confessionMatched: Boolean = false
+    private var micDisclosureShown: Boolean = false
+    private var speechHelper: ConfessionSpeechHelper? = null
+
+    private val requestMicPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            speechHelper?.startListening()
+        } else {
+            fallBackToTypedOnly()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,12 +98,23 @@ class AlarmActivity : AppCompatActivity() {
         policyStore = BlockedItemPolicyStore(this)
         interventionLog = InterventionLog(this)
         visitTracker = VisitTracker(this)
+        settingsStore = AppSettingsStore(this)
         audio = AlarmAudioController(this)
 
         startPulse()
 
         binding.alarmEscape.setOnClickListener { escape() }
         binding.alarmGiveIn.setOnClickListener { giveIn() }
+        binding.alarmConfessionMic.setOnClickListener { onMicClicked() }
+        binding.alarmConfessionInput.addTextChangedListener(confessionTextWatcher)
+        binding.alarmConfessionInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                evaluateConfession(binding.alarmConfessionInput.text?.toString().orEmpty())
+                true
+            } else {
+                false
+            }
+        }
 
         // Back must not drop the user into the blocked app: send them home instead.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -96,6 +131,7 @@ class AlarmActivity : AppCompatActivity() {
     private fun dismissForDormant() {
         countDownTimer?.cancel()
         pulseAnimator?.cancel()
+        speechHelper?.stopListening()
         audio.stop()
         finish()
     }
@@ -115,6 +151,8 @@ class AlarmActivity : AppCompatActivity() {
         displayName = intent.getStringExtra(EXTRA_DISPLAY_NAME) ?: item
         binding.alarmSubtitle.text = getString(R.string.alarm_subtitle, displayName)
 
+        resetConfessionUi()
+
         interventionLog.append(
             InterventionEvent(
                 timestamp = System.currentTimeMillis(),
@@ -131,12 +169,7 @@ class AlarmActivity : AppCompatActivity() {
     private fun setUpGiveIn(item: String) {
         val policy = policyStore.get(item)
         binding.alarmGiveIn.isEnabled = false
-        binding.alarmGiveIn.text = if (policy.confessionEnabled) {
-            // Task 15 wires the actual confession flow; for now this is a disabled placeholder.
-            getString(R.string.alarm_givein_confession_placeholder)
-        } else {
-            giveInLabel(policy.enforcementMode)
-        }
+        binding.alarmGiveIn.text = giveInLabel(policy.enforcementMode)
     }
 
     private fun giveInLabel(mode: EnforcementMode): String = when (mode) {
@@ -154,11 +187,169 @@ class AlarmActivity : AppCompatActivity() {
 
             override fun onFinish() {
                 binding.alarmCountdown.text = "0"
-                if (!policyStore.get(item).confessionEnabled) {
+                val policy = policyStore.get(item)
+                if (policy.confessionEnabled) {
+                    showConfessionUi()
+                } else {
                     binding.alarmGiveIn.isEnabled = true
                 }
             }
         }.start()
+    }
+
+    private fun resetConfessionUi() {
+        speechHelper?.destroy()
+        speechHelper = null
+        expectedConfession = null
+        confessionMatched = false
+        micDisclosureShown = false
+        binding.alarmConfessionPanel.visibility = View.GONE
+        binding.alarmCountdown.visibility = View.VISIBLE
+        binding.alarmConfessionInput.setText("")
+        binding.alarmConfessionStatus.text = ""
+        binding.alarmConfessionMic.visibility = View.VISIBLE
+        binding.alarmConfessionMic.isEnabled = true
+    }
+
+    private fun showConfessionUi() {
+        binding.alarmCountdown.visibility = View.GONE
+        binding.alarmGiveIn.isEnabled = false
+
+        val creativeIds = redirectionManager.getCreativityBoostingItems().toList()
+        val creativeDisplay = ConfessionSentence.pickCreativeDisplay(
+            settingsStore.lastCreativeItem,
+            creativeIds,
+        ) { id -> resolveItemDisplayName(id) }
+        val sentence = ConfessionSentence.build(displayName, creativeDisplay)
+        expectedConfession = sentence
+
+        binding.alarmConfessionSentence.text = sentence
+        binding.alarmConfessionStatus.text = ""
+        binding.alarmConfessionPanel.visibility = View.VISIBLE
+
+        ensureSpeechHelper()
+        updateMicVisibility()
+    }
+
+    private fun resolveItemDisplayName(id: String): String {
+        return try {
+            val info = packageManager.getApplicationInfo(id, 0)
+            packageManager.getApplicationLabel(info).toString()
+        } catch (_: PackageManager.NameNotFoundException) {
+            id
+        }
+    }
+
+    private fun ensureSpeechHelper() {
+        if (speechHelper != null) return
+        speechHelper = ConfessionSpeechHelper(
+            this,
+            object : ConfessionSpeechHelper.Callback {
+                override fun onSpeechResult(text: String) {
+                    evaluateConfession(text, fromSpeech = true)
+                }
+
+                override fun onSpeechError(forceTypedFallback: Boolean) {
+                    if (forceTypedFallback) {
+                        fallBackToTypedOnly()
+                    } else if (!confessionMatched) {
+                        binding.alarmConfessionStatus.text = getString(R.string.confession_retry)
+                    }
+                }
+
+                override fun onListeningChanged(listening: Boolean) {
+                    binding.alarmConfessionMic.isEnabled =
+                        !listening && speechHelper?.isSpeechUsable == true
+                    binding.alarmConfessionMic.alpha = if (listening) 0.5f else 1f
+                }
+            },
+        )
+    }
+
+    private fun updateMicVisibility() {
+        val usable = speechHelper?.isSpeechUsable == true
+        binding.alarmConfessionMic.visibility = if (usable) View.VISIBLE else View.GONE
+    }
+
+    private fun fallBackToTypedOnly() {
+        binding.alarmConfessionMic.visibility = View.GONE
+        binding.alarmConfessionMic.isEnabled = false
+        if (!confessionMatched) {
+            binding.alarmConfessionStatus.text = ""
+        }
+    }
+
+    private fun onMicClicked() {
+        if (confessionMatched) return
+        ensureSpeechHelper()
+        if (speechHelper?.isSpeechUsable != true) {
+            fallBackToTypedOnly()
+            return
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            speechHelper?.startListening()
+            return
+        }
+        if (!micDisclosureShown) {
+            showMicDisclosure()
+        } else {
+            requestMicPermission.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    private fun showMicDisclosure() {
+        micDisclosureShown = true
+        AlertDialog.Builder(this)
+            .setTitle(R.string.confession_mic_disclosure_title)
+            .setMessage(R.string.confession_mic_disclosure)
+            .setPositiveButton(R.string.confession_mic_disclosure_continue) { _, _ ->
+                requestMicPermission.launch(Manifest.permission.RECORD_AUDIO)
+            }
+            .setNegativeButton(R.string.confession_mic_use_typed) { _, _ ->
+                fallBackToTypedOnly()
+            }
+            .setCancelable(true)
+            .setOnCancelListener { fallBackToTypedOnly() }
+            .show()
+    }
+
+    private val confessionTextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+        override fun afterTextChanged(s: Editable?) {
+            evaluateConfession(s?.toString().orEmpty())
+        }
+    }
+
+    private fun evaluateConfession(candidate: String, fromSpeech: Boolean = false) {
+        val expected = expectedConfession ?: return
+        if (candidate.isBlank()) {
+            if (confessionMatched) {
+                confessionMatched = false
+                binding.alarmGiveIn.isEnabled = false
+                binding.alarmConfessionStatus.text = ""
+            }
+            return
+        }
+        if (ConfessionNormalizer.matches(candidate, expected)) {
+            confessionMatched = true
+            binding.alarmGiveIn.isEnabled = true
+            binding.alarmConfessionStatus.text = getString(R.string.confession_matched)
+            speechHelper?.stopListening()
+        } else {
+            if (confessionMatched) {
+                confessionMatched = false
+                binding.alarmGiveIn.isEnabled = false
+            }
+            // Speech mismatches always retry; typed shows retry once the attempt is substantial.
+            if (fromSpeech || candidate.length >= expected.length / 2) {
+                binding.alarmConfessionStatus.text = getString(R.string.confession_retry)
+            } else {
+                binding.alarmConfessionStatus.text = ""
+            }
+        }
     }
 
     private fun startPulse() {
@@ -179,6 +370,7 @@ class AlarmActivity : AppCompatActivity() {
 
     private fun escape() {
         audio.stop()
+        speechHelper?.stopListening()
         val item = blockedItem
         if (item != null) {
             interventionLog.append(
@@ -205,9 +397,11 @@ class AlarmActivity : AppCompatActivity() {
 
     private fun giveIn() {
         val item = blockedItem ?: return
-        audio.stop()
-        val now = System.currentTimeMillis()
         val policy = policyStore.get(item)
+        if (policy.confessionEnabled && !confessionMatched) return
+        audio.stop()
+        speechHelper?.stopListening()
+        val now = System.currentTimeMillis()
         when (policy.enforcementMode) {
             EnforcementMode.STRICT -> {
                 allowanceManager.grantStrict(item, now)
@@ -265,6 +459,7 @@ class AlarmActivity : AppCompatActivity() {
     override fun onPause() {
         // Stop audio before flipping isShowing so a rapid re-launch (service polling
         // sees us no longer showing) can never overlap two klaxon/vibration players.
+        speechHelper?.stopListening()
         audio.stop()
         isShowing = false
         super.onPause()
@@ -272,6 +467,8 @@ class AlarmActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         if (current === this) current = null
+        speechHelper?.destroy()
+        speechHelper = null
         super.onDestroy()
         countDownTimer?.cancel()
         pulseAnimator?.cancel()

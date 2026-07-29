@@ -73,6 +73,17 @@
     <string name="alarm_givein_visit">Use it this visit</string>
     <string name="alarm_givein_confession_placeholder">Say the trade…</string>
 
+    <!-- Confession (speak or type before give-in) -->
+    <string name="confession_prompt">Confess the trade:</string>
+    <string name="confession_type_hint">Type the sentence…</string>
+    <string name="confession_retry">That didn\'t match — try again.</string>
+    <string name="confession_matched">Matched. Tap give-in when ready.</string>
+    <string name="confession_mic_content_description">Speak the confession</string>
+    <string name="confession_mic_disclosure_title">Microphone for confession</string>
+    <string name="confession_mic_disclosure">Creativitism can listen while you say the confession sentence so you do not have to type it.\n\nAudio is processed by Android\'s speech recognition and is never stored or uploaded by Creativitism. If on-device recognition is unavailable, the platform speech service may process audio transiently.\n\nYou can always type the sentence instead.</string>
+    <string name="confession_mic_disclosure_continue">Continue</string>
+    <string name="confession_mic_use_typed">I\'ll type instead</string>
+
     <!-- Foreground service notification -->
     <string name="notification_channel_name">Protection service</string>
     <string name="notification_channel_description">Keeps watch for blocked apps</string>

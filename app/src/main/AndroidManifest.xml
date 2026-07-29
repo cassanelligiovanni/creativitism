@@ -32,6 +32,9 @@
     <!-- Permission to vibrate as part of the fire-alarm intervention -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- Optional mic for spoken confession; typed fallback always available -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <application
         android:name=".CreativitismApp"
         android:allowBackup="true"
