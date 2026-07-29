@@ -24,15 +24,6 @@
 
     <style name="Theme.Creativitism" parent="Base.Theme.Creativitism" />
 
-    <!-- "Take a breath" sheet: translucent activity, frost drawn by the layout -->
-    <style name="Theme.Creativitism.Interstitial">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-    </style>
-
     <!-- Fire alarm: fully opaque so the blocked app can never peek through. The
          background color itself is driven by AlarmActivity's pulse animator. -->
     <style name="Theme.Creativitism.Alarm" parent="Theme.Material3.Dark.NoActionBar">

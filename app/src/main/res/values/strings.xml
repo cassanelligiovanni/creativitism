@@ -59,13 +59,6 @@
     <string name="accessibility_disclosure">Creativitism uses Android\'s AccessibilityService API to read the web address shown in your browser\'s address bar. This is only used to check the address against your own blocked list and pause the page when it matches.\n\nCreativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings.</string>
     <string name="accessibility_disclosure_accept">I understand, continue</string>
 
-    <!-- Interstitial -->
-    <string name="interstitial_title">Take a breath.</string>
-    <string name="interstitial_subtitle">You were opening %1$s.</string>
-    <string name="interstitial_subtitle_generic">You were opening a blocked app.</string>
-    <string name="interstitial_redirect">Take me somewhere better</string>
-    <string name="interstitial_allow">Use it for 5 minutes</string>
-
     <!-- Alarm -->
     <string name="alarm_title">STOP.</string>
     <string name="alarm_subtitle">You were opening %1$s.</string>

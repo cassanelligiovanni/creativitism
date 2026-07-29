@@ -20,28 +20,4 @@
     <!-- Fire-alarm activity: opaque, pulses between these two -->
     <color name="cv_alarm_bg">#0A0000</color>
     <color name="cv_alarm_red">#C11F1F</color>
-
-    <!-- Legacy aliases (interstitial / launcher — Task 20 removes) -->
-    <color name="cv_ink">@color/cv_text</color>
-    <color name="cv_muted">@color/cv_text_secondary</color>
-    <color name="cv_teal">@color/cv_escape</color>
-    <color name="cv_on_teal">@color/cv_text</color>
-    <color name="cv_sienna">@color/cv_blocked</color>
-    <color name="cv_paper_top">@color/cv_bg</color>
-    <color name="cv_paper_mid">@color/cv_surface</color>
-    <color name="cv_paper_bottom">@color/cv_bg</color>
-    <color name="cv_glass_hi">@color/cv_card</color>
-    <color name="cv_glass_lo">@color/cv_surface</color>
-    <color name="cv_glass_stroke">@color/cv_border</color>
-    <color name="cv_divider">@color/cv_border</color>
-    <color name="cv_wash_teal">#00000000</color>
-    <color name="cv_wash_apricot">#00000000</color>
-    <color name="cv_button_bg">@color/cv_text</color>
-    <color name="cv_button_text">@color/cv_bg</color>
-    <color name="cv_frost_top">@color/cv_card</color>
-    <color name="cv_frost_mid">@color/cv_surface</color>
-    <color name="cv_frost_bottom">@color/cv_bg</color>
-    <color name="cv_disc_top">@color/cv_card</color>
-    <color name="cv_disc_bottom">@color/cv_surface</color>
-    <color name="cv_ring_track">#40252829</color>
 </resources>
