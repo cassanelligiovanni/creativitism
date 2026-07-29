@@ -56,7 +56,7 @@
     <!-- Accessibility service (prominent disclosure — Play policy) -->
     <string name="accessibility_service_label">Creativitism website blocking</string>
     <string name="accessibility_disclosure_title">Website blocking uses accessibility</string>
-    <string name="accessibility_disclosure">Creativitism uses Android\'s AccessibilityService API to read the web address shown in your browser\'s address bar. This is only used to check the address against your own blocked list and pause the page when it matches.\n\nCreativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings.</string>
+    <string name="accessibility_disclosure">Creativitism uses Android\'s AccessibilityService API to read the web address shown in your browser\'s address bar. This is only used to check the address against your own blocked list and show the fire-alarm intervention when it matches.\n\nCreativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings.</string>
     <string name="accessibility_disclosure_accept">I understand, continue</string>
 
     <!-- Alarm -->

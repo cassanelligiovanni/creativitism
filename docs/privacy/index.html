@@ -53,7 +53,7 @@
     <p class="eff">Effective date: July 29, 2026</p>
     <p>This policy applies to the Creativitism Android app (package name <code>com.creativitism.appredirector</code>). It is written in plain language on purpose. If anything here is unclear, contact us using the address at the bottom.</p>
 
-    <div class="lede"><strong>The short version:</strong> Creativitism does not collect, transmit, store remotely, share, or sell any of your data. Everything the app knows about you stays on your device. There is no account, no server, no analytics, and no advertising in this app.</div>
+    <div class="lede"><strong>The short version:</strong> Creativitism does not collect, transmit, store remotely, or sell any of your data. Everything the app knows about you stays on your device. There is no account, no server, no analytics, and no advertising. The app never shares data automatically; the only optional share is a weekly receipt image you explicitly send via Android's share sheet (see Sharing).</div>
 
     <h2>What Creativitism does</h2>
     <p>Creativitism lets you mark apps and websites as either "Blocked" (things you'd rather spend less time on) or "Creative" (things you'd rather spend time on instead). When you open something on your Blocked list, the app shows a full-screen fire-alarm intervention — loud alarm sound and vibration — for ten seconds, after which you can choose to be redirected to something on your Creative list, type or speak a short confession to continue, or use the blocked app or site for five minutes before the alarm triggers again.</p>
@@ -64,7 +64,7 @@
       <li>The lists of apps and websites you've marked as Blocked or Creative.</li>
       <li>Per-item enforcement settings (for example, whether a confession is required).</li>
       <li>Your active-hours schedule and temporary allowances.</li>
-      <li>Local intervention statistics (escapes, give-ins, and related counts) used for in-app stats and an optional weekly receipt.</li>
+      <li>Local intervention events used for in-app stats and an optional weekly receipt — including when a fire alarm fired, escapes, give-ins, and allowances, each with the blocked item id and display label. These events are retained on-device for about 90 days, then pruned.</li>
     </ul>
     <p>This is stored using Android's <code>SharedPreferences</code> mechanism, which writes files in the app's private storage area on your device. Creativitism explicitly excludes these preference files from Android Auto Backup and device-to-device transfer, so your lists, stats, and settings are not synced to Google cloud backup or copied during a device transfer unless you separately export them.</p>
     <p>This data:</p>
@@ -78,12 +78,12 @@
     <p>Creativitism requests a small number of Android permissions. Each one exists for a single, narrow purpose. None are used to collect data about you for any purpose other than the immediate on-device function described.</p>
 
     <h3>Usage Access (<code>PACKAGE_USAGE_STATS</code>)</h3>
-    <p>Used solely to detect which app is currently in the foreground, so Creativitism can tell whether you've just opened something on your Blocked list. The check happens locally, in real time; the app does not log, store, or transmit your app usage history. A decision is made (pause or don't pause) and nothing about it is retained beyond that immediate decision.</p>
+    <p>Used solely to detect which app is currently in the foreground, so Creativitism can tell whether you've just opened something on your Blocked list. The check happens locally, in real time, and Usage Access data is not transmitted off the device. Creativitism does <strong>not</strong> keep a full history of every app you open. When a blocked item triggers the fire-alarm intervention, the app does record a local intervention event (item id, display label, and event kind such as alarm fired / escape / give-in) for on-device stats — see "Information we store." Unblocked foreground checks are not retained.</p>
 
     <h3>Accessibility Service</h3>
     <p>Creativitism includes an optional Android <code>AccessibilityService</code>, used solely to read the web address currently shown in your browser's address bar (specifically, Chrome), so the app can compare that address against the website list you've built in the Blocked section. This is the only thing the service reads — it does not read page content, form fields, passwords, or anything else on screen, and it does not read any app other than the browser.</p>
     <p>The comparison happens entirely on your device. The URL being checked is not collected, stored, or shared. It's read, compared against your own local blocklist, and discarded.</p>
-    <blockquote>"Creativitism uses Android's AccessibilityService API to read the web address shown in your browser's address bar. This is only used to check the address against your own blocked list and pause the page when it matches. Creativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings."</blockquote>
+    <blockquote>"Creativitism uses Android's AccessibilityService API to read the web address shown in your browser's address bar. This is only used to check the address against your own blocked list and show the fire-alarm intervention when it matches. Creativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings."</blockquote>
     <p>You can disable this at any time in Android Settings → Accessibility. Website blocking will stop until you turn it back on; app blocking does not depend on this permission.</p>
 
     <h3>Query All Packages (<code>QUERY_ALL_PACKAGES</code>)</h3>

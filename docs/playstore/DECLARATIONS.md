@@ -45,7 +45,7 @@ reading the URL currently displayed in the user's browser address bar (Chrome
 only — see the accessibility_service_config.xml packageNames restriction) so it
 can be compared, entirely on-device, against a list of websites the user has
 personally chosen to block. When the current URL matches an entry on the user's
-own list, the app shows a pause screen, consistent with its core function as a
+own list, the app shows a full-screen fire-alarm intervention, consistent with its core function as a
 digital-wellbeing app blocker.
 
 The service does not read, log, or transmit page content, form input, other
@@ -67,7 +67,8 @@ Website blocking uses accessibility
 
 Creativitism uses Android's AccessibilityService API to read the web address
 shown in your browser's address bar. This is only used to check the address
-against your own blocked list and pause the page when it matches.
+against your own blocked list and show the fire-alarm intervention when it
+matches.
 
 Creativitism does not collect, store, or share this data, and never reads any
 other content from your screen. You can turn this off anytime in Accessibility
@@ -110,12 +111,13 @@ Play Console path: **Policy → App content → Permissions declaration form** f
 ```
 Creativitism needs to detect which app is currently in the foreground in order
 to recognize the moment the user opens an app on their own Blocked list, so it
-can show the pause screen before the app continues to load. This is the entire
-purpose of the permission: a real-time check of "is this app one the user asked
-to be paused for," performed on-device. Creativitism does not log, store, or
-transmit a history of which apps the user opens or when. No usage statistics
-are retained beyond the immediate check needed to trigger (or not trigger) the
-pause screen.
+can show the fire-alarm intervention before the app continues to load. This is
+the entire purpose of the permission: a real-time check of "is this app one the
+user asked to be interrupted for," performed on-device. Creativitism does not
+transmit Usage Access data off the device and does not keep a full history of
+every app opened. When a blocked item triggers the fire alarm, a local
+intervention event (item id, display label, event kind) is retained on-device
+for stats (about 90 days); unblocked foreground checks are not retained.
 ```
 
 ---
@@ -137,7 +139,7 @@ If Play Console's Foreground Service (Special Use) declaration form asks for a l
 ```
 This foreground service continuously checks which app is in the foreground so
 that Creativitism can intercept apps the user has personally added to their
-Blocked list and show a pause/redirect screen before the app opens. This is a
+Blocked list and show a fire-alarm intervention before the app opens. This is a
 core, user-initiated function of a digital-wellbeing app blocker and cannot be
 achieved reliably with a non-foreground service, since Android aggressively
 suspends background processes that aren't running as a foreground service.
@@ -159,7 +161,7 @@ Answer every data-type section the same way, since the app collects nothing:
 No
 ```
 
-If the form still steps through each category individually (Location, Personal info, Financial info, Health and fitness, Messages, Photos/videos, Audio files, Files and docs, Calendar, Contacts, App activity, Web browsing, App info and performance, Device or other IDs) — answer **"Data is not collected"** for every single one. This is accurate: the app reads a foreground app package name and a URL transiently to compare against a local list, but never collects (i.e., never stores beyond immediate use, logs, or transmits) any of it in the sense Play's form means by "collect."
+If the form still steps through each category individually (Location, Personal info, Financial info, Health and fitness, Messages, Photos/videos, Audio files, Files and docs, Calendar, Contacts, App activity, Web browsing, App info and performance, Device or other IDs) — answer **"Data is not collected"** for every single one in the Play sense of collection for sharing/off-device use. Locally, Creativitism stores user-created lists and on-device intervention events (including alarm-fired item id/label) for stats; those stay on the device unless the user explicitly shares a weekly receipt image.
 
 **Is all user data encrypted in transit?**
 ```

@@ -6,7 +6,7 @@ This policy applies to the Creativitism Android app (package name `com.creativit
 
 ## The short version
 
-Creativitism does not collect, transmit, store remotely, share, or sell any of your data. Everything the app knows about you stays on your device. There is no account, no server, no analytics, and no advertising in this app.
+Creativitism does not collect, transmit, store remotely, or sell any of your data. Everything the app knows about you stays on your device. There is no account, no server, no analytics, and no advertising. The app never shares data automatically; the only optional share is a weekly receipt image you explicitly send via Android's share sheet (see Sharing).
 
 ## What Creativitism does
 
@@ -19,7 +19,7 @@ Creativitism stores, on your device only:
 - The lists of apps and websites you've marked as Blocked or Creative.
 - Per-item enforcement settings (for example, whether a confession is required).
 - Your active-hours schedule and temporary allowances.
-- Local intervention statistics (escapes, give-ins, and related counts) used for in-app stats and an optional weekly receipt.
+- Local intervention events used for in-app stats and an optional weekly receipt — including when a fire alarm fired, escapes, give-ins, and allowances, each with the blocked item id and display label. These events are retained on-device for about 90 days, then pruned.
 
 This is stored using Android's `SharedPreferences` mechanism, which writes files in the app's private storage area on your device. Creativitism explicitly excludes these preference files from Android Auto Backup and device-to-device transfer, so your lists, stats, and settings are not synced to Google cloud backup or copied during a device transfer unless you separately export them.
 
@@ -35,7 +35,7 @@ Creativitism requests a small number of Android permissions. Each one exists for
 
 ### Usage Access (`PACKAGE_USAGE_STATS`)
 
-Used solely to detect which app is currently in the foreground on your device, so Creativitism can tell whether you've just opened something on your Blocked list. The app checks the foreground app locally, in real time, and does not log, store, or transmit your app usage history. We do not build a history of what you've opened; the check happens, a decision is made (pause or don't pause), and nothing about it is retained beyond what's needed for that immediate decision.
+Used solely to detect which app is currently in the foreground on your device, so Creativitism can tell whether you've just opened something on your Blocked list. The app checks the foreground app locally, in real time, and does not transmit Usage Access data off the device. Creativitism does **not** keep a full history of every app you open. When a blocked item triggers the fire-alarm intervention, the app does record a local intervention event (item id, display label, and event kind such as alarm fired / escape / give-in) for on-device stats — see "Information we store." Unblocked foreground checks are not retained.
 
 ### Accessibility Service
 
@@ -45,7 +45,7 @@ The comparison happens entirely on your device. The URL being checked is not col
 
 This matches the disclosure shown inside the app itself before you turn this feature on:
 
-> "Creativitism uses Android's AccessibilityService API to read the web address shown in your browser's address bar. This is only used to check the address against your own blocked list and pause the page when it matches. Creativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings."
+> "Creativitism uses Android's AccessibilityService API to read the web address shown in your browser's address bar. This is only used to check the address against your own blocked list and show the fire-alarm intervention when it matches. Creativitism does not collect, store, or share this data, and never reads any other content from your screen. You can turn this off anytime in Accessibility settings."
 
 You can disable this at any time in Android Settings → Accessibility, and website blocking will simply stop working until you turn it back on; app blocking (for apps, not websites) does not depend on this permission.
 

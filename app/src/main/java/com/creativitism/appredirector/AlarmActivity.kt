@@ -38,9 +38,10 @@ class AlarmActivity : AppCompatActivity() {
         private const val PULSE_HALF_CYCLE_MILLIS = 450L
 
         /**
-         * True while the alarm is in the foreground. The monitoring service uses this
-         * to avoid relaunching us (which would restart the countdown) and to know an
-         * alarm is currently live.
+         * True while an alarm session is alive (from create/resume until destroy).
+         * The monitoring service uses this to avoid relaunching us (which would
+         * restart the countdown). Cleared only in [onDestroy], not on transient
+         * pauses such as the mic permission sheet.
          */
         @Volatile
         var isShowing: Boolean = false
@@ -93,6 +94,7 @@ class AlarmActivity : AppCompatActivity() {
         binding = ActivityAlarmBinding.inflate(layoutInflater)
         setContentView(binding.root)
         current = this
+        isShowing = true
 
         allowanceManager = TemporaryAllowanceManager(this)
         redirectionManager = RedirectionManager(this)
@@ -476,15 +478,17 @@ class AlarmActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        // Stop audio before flipping isShowing so a rapid re-launch (service polling
-        // sees us no longer showing) can never overlap two klaxon/vibration players.
+        // Stop audio/speech on any pause (home, mic permission sheet, etc.).
+        // Do NOT clear isShowing here — transient pauses must keep the guard so
+        // RedirectorService/UrlInterceptor cannot re-fire via onNewIntent and
+        // reset the countdown/confession. Clear only when the alarm is gone.
         speechHelper?.stopListening()
         audio.stop()
-        isShowing = false
         super.onPause()
     }
 
     override fun onDestroy() {
+        isShowing = false
         if (current === this) current = null
         speechHelper?.destroy()
         speechHelper = null
