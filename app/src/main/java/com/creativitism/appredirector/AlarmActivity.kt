@@ -400,8 +400,9 @@ class AlarmActivity : AppCompatActivity() {
                 ),
             )
         }
-        val target = redirectionManager.getRandomCreativityBoostingItem()
+        val target = escapeTarget(settingsStore, redirectionManager)
         if (target != null) {
+            settingsStore.lastCreativeItem = target
             val proxyIntent = Intent(this, RedirectProxyActivity::class.java).apply {
                 putExtra("TARGET_ITEM", target)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

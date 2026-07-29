@@ -56,4 +56,12 @@ class RedirectionManager(private val context: Context) {
         val items = getCreativityBoostingItems()
         return if (items.isNotEmpty()) items.random() else null
     }
-} 
+}
+
+fun escapeTarget(settings: AppSettingsStore, redirection: RedirectionManager): String? {
+    if (settings.resumeLastWork) {
+        val last = settings.lastCreativeItem
+        if (last != null && redirection.getCreativityBoostingItems().contains(last)) return last
+    }
+    return redirection.getRandomCreativityBoostingItem()
+}

@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var policyStore: BlockedItemPolicyStore
     private lateinit var allowanceManager: TemporaryAllowanceManager
     private lateinit var visitTracker: VisitTracker
+    private lateinit var settingsStore: AppSettingsStore
 
     private var allApps: List<AppInfo> = emptyList()
     private var searchQuery: String = ""
@@ -55,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         policyStore = BlockedItemPolicyStore(this)
         allowanceManager = TemporaryAllowanceManager(this)
         visitTracker = VisitTracker(this)
+        settingsStore = AppSettingsStore(this)
 
         setupUI()
         loadAllData()
@@ -120,6 +122,10 @@ class MainActivity : AppCompatActivity() {
         }
         binding.accessibilityPermissionButton.setOnClickListener {
             showAccessibilityDisclosure()
+        }
+        binding.resumeLastWorkSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (updatingSwitchFromCode) return@setOnCheckedChangeListener
+            settingsStore.resumeLastWork = isChecked
         }
     }
 
@@ -210,6 +216,7 @@ class MainActivity : AppCompatActivity() {
         val serviceEnabled = hasAllAppPerms && appStatePrefs.getBoolean("service_enabled", false)
         updatingSwitchFromCode = true
         binding.serviceSwitch.isChecked = serviceEnabled
+        binding.resumeLastWorkSwitch.isChecked = settingsStore.resumeLastWork
         updatingSwitchFromCode = false
         binding.statusText.text = getString(
             if (serviceEnabled) R.string.protection_on else R.string.protection_off

@@ -17,6 +17,8 @@
     <string name="soul_sucking_subtitle">Apps and sites that eat your time</string>
     <string name="creativity_boosting_title">Creative</string>
     <string name="creativity_boosting_subtitle">Where we send you instead</string>
+    <string name="resume_last_work_title">Resume my last work</string>
+    <string name="resume_last_work_subtitle">Escape opens your last creative app when possible</string>
     <string name="all_apps_title">Your apps</string>
     <string name="all_apps_subtitle">Send any app to Blocked or Creative</string>
     <string name="search_apps_hint">Search apps</string>
