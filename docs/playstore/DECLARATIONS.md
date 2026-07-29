@@ -74,7 +74,28 @@ other content from your screen. You can turn this off anytime in Accessibility
 settings.
 ```
 
-If the Play form asks for a demo video: record the flow from the app's "Turn on website blocking" action through the disclosure screen through the Android Accessibility settings toggle, and show a blocked site actually getting paused. Reviewers for this category frequently request video evidence — budget time for this before submitting.
+If the Play form asks for a demo video: record the flow from the app's "Turn on website blocking" action through the disclosure screen through the Android Accessibility settings toggle, and show a blocked site actually triggering the fire alarm. Reviewers for this category frequently request video evidence — budget time for this before submitting.
+
+---
+
+## (f) Microphone (`RECORD_AUDIO`) justification
+
+Play Console path: **Policy → App content → Permissions declaration form** for microphone access (triggered by `RECORD_AUDIO` in the manifest).
+
+**Core use case to select:** "Voice input for app functionality" / "Speech-to-text for user-initiated input" — pick whichever option matches optional confession entry during the fire-alarm intervention.
+
+**Justification text to paste:**
+
+```
+Creativitism optionally lets the user speak a short confession sentence during
+the fire-alarm intervention instead of typing it. RECORD_AUDIO is requested
+only after an in-app disclosure and only when the user chooses voice input.
+Audio is processed by Android's speech recognition (or the platform speech
+service when on-device recognition is unavailable) to produce text for an
+immediate on-device check. Creativitism does not record, store, upload, or
+transmit voice audio. The user can always type the confession instead and
+never grant microphone access.
+```
 
 ---
 
@@ -161,9 +182,13 @@ separately, because none is collected or stored off-device.
 
 **Data types collected (if the form requires you to positively state something rather than leave categories blank):**
 ```
-None. Creativitism collects no user data. It stores two user-created lists
-(blocked apps/sites, creative apps/sites) locally in Android SharedPreferences
-on the user's device, which never leaves the device.
+None transmitted off-device. Creativitism stores user-created lists,
+enforcement settings, active-hours schedule, and local intervention statistics
+in Android SharedPreferences on the user's device only. These files are
+excluded from Android Auto Backup. Optional microphone input for confession
+is processed by the platform speech service and is never stored by
+Creativitism. Weekly receipt sharing happens only when the user explicitly
+taps Share.
 ```
 
 **Security practices section (if present):**

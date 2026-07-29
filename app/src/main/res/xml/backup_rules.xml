@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <!-- Exclude specific shared preferences that contain sensitive data -->
-    <exclude domain="sharedpref" path="redirections.xml"/>
-</full-backup-content> 
+    <!-- Exclude app data from Android Auto Backup / cloud restore -->
+    <exclude domain="sharedpref" path="redirections_v2.xml"/>
+    <exclude domain="sharedpref" path="temporary_allowances.xml"/>
+    <exclude domain="sharedpref" path="blocked_item_policy.xml"/>
+    <exclude domain="sharedpref" path="active_hours.xml"/>
+    <exclude domain="sharedpref" path="app_settings.xml"/>
+    <exclude domain="sharedpref" path="intervention_log.xml"/>
+    <exclude domain="sharedpref" path="visit_tracker.xml"/>
+    <exclude domain="sharedpref" path="app_state.xml"/>
+</full-backup-content>

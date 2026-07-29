@@ -33,13 +33,13 @@ Some apps are where you make things. Some apps are where time goes and doesn't c
 
 Sort the apps and sites on your phone into two short lists: Blocked, for the ones that pull you in without giving much back, and Creative, for the ones where you actually make or build something. Everything else is left alone.
 
-When you open something on your Blocked list, Creativitism doesn't lecture you and doesn't lock you out. It gives you a moment. A full-screen pause appears — "Take a breath" — and asks you to wait ten seconds before doing anything else. Ten seconds is not a punishment. It's just long enough to notice you're about to do the thing on autopilot, and to decide on purpose instead.
+When you open something on your Blocked list, Creativitism doesn't lecture you and doesn't lock you out. It sounds the alarm. A full-screen fire alarm appears — loud, vibrating, impossible to ignore — and you wait ten seconds before doing anything else. Ten seconds is not a punishment. It's just long enough to notice you're about to do the thing on autopilot, and to decide on purpose instead.
 
-After the pause, you choose. You can be sent straight to one of your Creative apps or sites instead — the sketchbook, the notes app, the instrument, whatever you've told Creativitism you'd rather be doing. Or you can go ahead anyway and use the blocked app for five minutes. No shame, no streaks, no guilt copy. Five minutes, on the clock. When the five minutes are up, you're paused again, and you choose again.
+After the alarm, you choose. You can be sent straight to one of your Creative apps or sites instead — the sketchbook, the notes app, the instrument, whatever you've told Creativitism you'd rather be doing. Or you can confess why you're opening the blocked app (type it, or optionally speak it using your phone's speech recognition) and continue for five minutes. No shame, no streaks, no guilt copy. Five minutes, on the clock. When the five minutes are up, the alarm goes off again, and you choose again.
 
-That's the whole mechanism. There's no scoring, no leaderboard, no notifications nagging you back into the app to check your "progress." Creativitism isn't trying to gamify your attention — it's trying to interrupt the part where you don't notice you've handed it over.
+That's the whole mechanism. There's no scoring, no leaderboard, no notifications nagging you back into the app to check your "progress." Creativitism isn't trying to gamify your attention — it's trying to interrupt the part where you don't notice you've handed it over. Local stats and an optional weekly receipt stay on your phone; sharing a receipt only happens if you tap Share yourself.
 
-Under the hood, Creativitism watches which app is in front so it knows when to step in, and — if you turn on website blocking — reads the address bar in your browser so it can catch specific sites, not just apps. Both of these only ever run the check "is this on my own list?" Nothing about what you look at, type, or do is collected, sent anywhere, or stored outside your phone. There's no account to make, no server to talk to, no analytics, no ads. Your two lists live in this app's local storage and nowhere else.
+Under the hood, Creativitism watches which app is in front so it knows when to step in, and — if you turn on website blocking — reads the address bar in your browser so it can catch specific sites, not just apps. Both of these only ever run the check "is this on my own list?" Nothing about what you look at, type, or say is collected, sent anywhere, or stored outside your phone. Optional microphone use for confession is processed by Android's speech recognition and is never stored by Creativitism. There's no account to make, no server to talk to, no analytics, no ads. Your lists and stats live in this app's local storage and nowhere else.
 
 Creativitism doesn't promise to fix your relationship with your phone. It just puts a small, deliberate pause where there used to be none, and leaves the rest of the decision to you.
 ```
@@ -105,8 +105,9 @@ Play Console will not let you publish without these. Specs per Play's current re
 
 1. Home screen showing the Blocked and Creative lists.
 2. "Your apps" picker used to add an app to a list.
-3. The "Take a breath" pause screen (interstitial) mid-countdown.
-4. The choice screen after the pause: redirect vs. use for 5 minutes.
+3. The fire-alarm intervention screen mid-countdown.
+4. The choice screen after the alarm: redirect vs. confess and continue for 5 minutes.
 5. Protection status card showing protection is on.
+6. Weekly receipt with local stats (optional share).
 
 Capture at a phone's native resolution (e.g. via Android Studio's emulator or `adb shell screencap`), crop to remove system status-bar clutter if desired, and save as PNG into `docs/playstore/assets/` before uploading to Play Console.

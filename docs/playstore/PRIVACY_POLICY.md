@@ -1,6 +1,6 @@
 # Privacy Policy for Creativitism
 
-**Effective date: July 22, 2026**
+**Effective date: July 29, 2026**
 
 This policy applies to the Creativitism Android app (package name `com.creativitism.appredirector`). It is written in plain language on purpose. If anything here is unclear, contact us using the address at the bottom.
 
@@ -10,17 +10,23 @@ Creativitism does not collect, transmit, store remotely, share, or sell any of y
 
 ## What Creativitism does
 
-Creativitism lets you mark apps and websites as either "Blocked" (things you'd rather spend less time on) or "Creative" (things you'd rather spend time on instead). When you open something on your Blocked list, the app shows a full-screen pause for ten seconds, after which you can choose to be redirected to something on your Creative list, or continue to the blocked app or site for five minutes before being paused again.
+Creativitism lets you mark apps and websites as either "Blocked" (things you'd rather spend less time on) or "Creative" (things you'd rather spend time on instead). When you open something on your Blocked list, the app shows a full-screen fire-alarm intervention — loud alarm sound and vibration — for ten seconds, after which you can choose to be redirected to something on your Creative list, type or speak a short confession to continue, or use the blocked app or site for five minutes before the alarm triggers again.
 
 ## Information we store
 
-The only information Creativitism stores is the information you put into it directly: the list of apps and websites you've marked as Blocked, and the list you've marked as Creative. This is stored using Android's `SharedPreferences` mechanism, which writes a file in the app's private storage area on your device.
+Creativitism stores, on your device only:
+
+- The lists of apps and websites you've marked as Blocked or Creative.
+- Per-item enforcement settings (for example, whether a confession is required).
+- Your active-hours schedule and temporary allowances.
+- Local intervention statistics (escapes, give-ins, and related counts) used for in-app stats and an optional weekly receipt.
+
+This is stored using Android's `SharedPreferences` mechanism, which writes files in the app's private storage area on your device. Creativitism explicitly excludes these preference files from Android Auto Backup and device-to-device transfer, so your lists, stats, and settings are not synced to Google cloud backup or copied during a device transfer unless you separately export them.
 
 This data:
 
-- Never leaves your device.
-- Is not transmitted to us, to the app's developer, or to any third party.
-- Is not backed up to any server we control (standard Android/Google device backup, if you have it enabled at the OS level, is controlled by you and Google, not by this app).
+- Never leaves your device unless you explicitly choose to share it (see "Sharing" below).
+- Is not transmitted to us, to the app's developer, or to any third party by the app itself.
 - Is not linked to your identity, an account, or an advertising ID, because none of those exist in this app.
 
 ## Permissions the app uses, and exactly why
@@ -57,11 +63,23 @@ Used only to show the persistent "protection is on" status notification and any 
 
 ### Display over other apps (`SYSTEM_ALERT_WINDOW`)
 
-Used to show the "Take a breath" pause screen on top of a blocked app when it's opened. Purely a UI mechanism; involves no data collection.
+Used to show the full-screen fire-alarm intervention on top of a blocked app when it's opened. Purely a UI mechanism; involves no data collection.
+
+### Vibration (`VIBRATE`)
+
+Used as part of the fire-alarm intervention when you open a blocked app or site. The device vibrates locally alongside the alarm sound. No vibration data is collected or transmitted.
+
+### Microphone (`RECORD_AUDIO`) — optional
+
+If you choose to speak a confession sentence instead of typing it, Creativitism may request microphone access. Audio is processed by Android's on-device speech recognition (or, when unavailable, the platform speech service) to convert speech to text for the immediate confession check. **Creativitism does not record, store, upload, or transmit your voice.** The app only receives the recognized text string for that one-time check; nothing from the microphone is saved by Creativitism. You can always type the confession instead and never grant this permission.
 
 ### Boot / battery / wake permissions (`RECEIVE_BOOT_COMPLETED`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, `WAKE_LOCK`)
 
 Used to restart the protection service after your device reboots and to keep it running reliably without being stopped by battery optimization. These are operational permissions with no data-collection function.
+
+## Sharing
+
+Creativitism never shares your data automatically. The only way information leaves the app is if you explicitly tap **Share** on the optional weekly receipt; that opens Android's standard share sheet so you can send a summary image to an app of your choice. Creativitism does not send that image anywhere on its own.
 
 ## What we don't do
 
