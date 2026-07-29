@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Deep warm charcoal base -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#1D1310"
+                android:centerColor="#120D0B"
+                android:endColor="#0E0B0A"
+                android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Ember blob, top-left -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:centerX="0.12"
+                android:centerY="0.02"
+                android:gradientRadius="440dp"
+                android:startColor="#4DFF6A3D"
+                android:centerColor="#1AFF6A3D"
+                android:endColor="#00FF6A3D" />
+        </shape>
+    </item>
+
+    <!-- Coral blob, upper-right -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:centerX="0.95"
+                android:centerY="0.16"
+                android:gradientRadius="480dp"
+                android:startColor="#40E5484D"
+                android:centerColor="#17E5484D"
+                android:endColor="#00E5484D" />
+        </shape>
+    </item>
+
+    <!-- Amber haze, lower-right -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:centerX="0.88"
+                android:centerY="0.72"
+                android:gradientRadius="360dp"
+                android:startColor="#21FFB25E"
+                android:centerColor="#0BFFB25E"
+                android:endColor="#00FFB25E" />
+        </shape>
+    </item>
+
+    <!-- Wine glow, bottom-center -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:centerX="0.42"
+                android:centerY="1.05"
+                android:gradientRadius="580dp"
+                android:startColor="#367A2E4D"
+                android:centerColor="#147A2E4D"
+                android:endColor="#007A2E4D" />
+        </shape>
+    </item>
+</layer-list>

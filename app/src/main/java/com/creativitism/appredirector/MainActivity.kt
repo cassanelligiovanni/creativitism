@@ -16,14 +16,17 @@ import android.os.Looper
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.creativitism.appredirector.databinding.ActivityMainBinding
-import com.google.android.material.chip.Chip
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.time.LocalDate
@@ -68,15 +71,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val weekdayChips: List<Pair<Chip, Int>> by lazy {
+    private val weekdayToggles: List<Pair<TextView, Int>> by lazy {
         listOf(
-            binding.chipMon to 0,
-            binding.chipTue to 1,
-            binding.chipWed to 2,
-            binding.chipThu to 3,
-            binding.chipFri to 4,
-            binding.chipSat to 5,
-            binding.chipSun to 6,
+            binding.dayMon to 0,
+            binding.dayTue to 1,
+            binding.dayWed to 2,
+            binding.dayThu to 3,
+            binding.dayFri to 4,
+            binding.daySat to 5,
+            binding.daySun to 6,
         )
     }
 
@@ -86,8 +89,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Let the aurora bleed under the system bars; pad the content instead.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.contentRoot) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, bars.top, 0, bars.bottom)
+            insets
+        }
 
         appListManager = AppListManager(this)
         redirectionManager = RedirectionManager(this)
@@ -179,7 +190,35 @@ class MainActivity : AppCompatActivity() {
         }
         binding.receiptShareButton.setOnClickListener { shareWeeklyReceipt() }
         binding.receiptDismissButton.setOnClickListener { dismissWeeklyReceipt() }
+        setupTabs()
         setupActiveHoursUI()
+    }
+
+    private fun setupTabs() {
+        val tabs = listOf(
+            binding.tabGuard to binding.tabContentGuard,
+            binding.tabLists to binding.tabContentLists,
+            binding.tabInsights to binding.tabContentInsights,
+        )
+        fun select(tab: TextView) {
+            tabs.forEach { (otherTab, otherContent) ->
+                val selected = otherTab === tab
+                otherTab.isSelected = selected
+                otherTab.setTypeface(
+                    otherTab.typeface,
+                    if (selected) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL,
+                )
+                otherContent.visibility =
+                    if (selected) android.view.View.VISIBLE else android.view.View.GONE
+            }
+        }
+        tabs.forEach { (tab, content) ->
+            tab.setOnClickListener {
+                select(tab)
+                content.scrollTo(0, 0)
+            }
+        }
+        select(binding.tabGuard)
     }
 
     private fun setupActiveHoursUI() {
@@ -191,8 +230,11 @@ class MainActivity : AppCompatActivity() {
         }
         binding.startTimeButton.setOnClickListener { showTimePicker(isStart = true) }
         binding.endTimeButton.setOnClickListener { showTimePicker(isStart = false) }
-        weekdayChips.forEach { (chip, _) ->
-            chip.setOnCheckedChangeListener { _, _ -> onWeekdaySelectionChanged() }
+        weekdayToggles.forEach { (toggle, _) ->
+            toggle.setOnClickListener {
+                toggle.isSelected = !toggle.isSelected
+                onWeekdaySelectionChanged()
+            }
         }
         refreshActiveHoursUI()
     }
@@ -222,7 +264,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun onWeekdaySelectionChanged() {
         if (updatingScheduleFromCode) return
-        val selected = weekdayChips.filter { it.first.isChecked }.map { it.second }.toSet()
+        val selected = weekdayToggles.filter { it.first.isSelected }.map { it.second }.toSet()
         activeHours = activeHours.copy(
             weekdaysBitmask = scheduleStore.weekdayBitmaskFromSelection(selected),
         )
@@ -243,15 +285,15 @@ class MainActivity : AppCompatActivity() {
         binding.endTimeButton.text = getString(
             R.string.active_hours_end,
         ) + " · " + SchedulePolicy.formatMinuteOfDay(activeHours.endMinuteOfDay)
-        syncWeekdayChips(activeHours.weekdaysBitmask)
+        syncWeekdayToggles(activeHours.weekdaysBitmask)
         updatingScheduleFromCode = false
         updateScheduleStatus()
     }
 
-    private fun syncWeekdayChips(bitmask: Int) {
+    private fun syncWeekdayToggles(bitmask: Int) {
         val selected = scheduleStore.selectedWeekdaysMonday0(bitmask)
-        weekdayChips.forEach { (chip, day) ->
-            chip.isChecked = selected.contains(day)
+        weekdayToggles.forEach { (toggle, day) ->
+            toggle.isSelected = selected.contains(day)
         }
     }
 

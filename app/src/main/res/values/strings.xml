@@ -5,6 +5,11 @@
     <string name="app_icon_description">App icon</string>
     <string name="tilde" translatable="false">~</string>
 
+    <!-- Tabs -->
+    <string name="tab_guard">Guard</string>
+    <string name="tab_lists">Lists</string>
+    <string name="tab_insights">Insights</string>
+
     <!-- Protection card -->
     <string name="protection_title">Protection</string>
     <string name="protection_on">blocked apps pause you first</string>

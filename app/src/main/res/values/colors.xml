@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Raycast dark tokens (Creativitism Milestone 1) -->
+    <!-- Ember glass palette: deep warm charcoal + amber/coral aurora -->
 
-    <color name="cv_bg">#07080a</color>
-    <color name="cv_surface">#101111</color>
-    <color name="cv_card">#1b1c1e</color>
-    <color name="cv_text">#f9f9f9</color>
-    <color name="cv_text_secondary">#9c9c9d</color>
-    <color name="cv_text_dim">#6a6b6c</color>
-    <color name="cv_blocked">#FF6363</color>
-    <color name="cv_creative">#5fc992</color>
-    <color name="cv_escape">#55b3ff</color>
-    <color name="cv_border">#252829</color>
+    <color name="cv_bg">#0E0B0A</color>
+    <color name="cv_surface">#1B1512</color>
+    <color name="cv_card">#14100E</color>
+    <color name="cv_text">#FAF4EC</color>
+    <color name="cv_text_secondary">#B8AA9E</color>
+    <color name="cv_text_dim">#7E7268</color>
+    <color name="cv_blocked">#FF6E63</color>
+    <color name="cv_creative">#FFC25E</color>
+    <color name="cv_escape">#FFB25E</color>
+    <color name="cv_border">#2EFFFFFF</color>
+
+    <!-- Glass tints -->
+    <color name="cv_glass_fill">#14FFFFFF</color>
+    <color name="cv_glass_overlay">#10FFFFFF</color>
+    <color name="cv_glass_fallback">#D814100E</color>
+    <color name="cv_glass_rim_top">#3DFFFFFF</color>
+    <color name="cv_glass_rim_bottom">#0AFFFFFF</color>
 
     <!-- Semantic error (dialogs, destructive) -->
-    <color name="cv_error">#FF6363</color>
+    <color name="cv_error">#FF6E63</color>
     <color name="cv_on_error">#FFFFFF</color>
 
     <!-- Fire-alarm activity: opaque, pulses between these two -->

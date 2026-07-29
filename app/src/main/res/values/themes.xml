@@ -16,8 +16,9 @@
         <item name="colorOnSurface">@color/cv_text</item>
         <item name="colorOnSurfaceVariant">@color/cv_text_secondary</item>
         <item name="colorOutline">@color/cv_border</item>
-        <item name="android:statusBarColor">@color/cv_bg</item>
-        <item name="android:navigationBarColor">@color/cv_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@drawable/bg_aurora</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
     </style>

@@ -35,6 +35,14 @@ class ManagedItemsAdapter(
         private var boundItemId: String? = null
         private var updatingFromCode = false
 
+        private var boundMode: EnforcementMode = EnforcementMode.STRICT
+
+        private fun selectEnforcement(mode: EnforcementMode) {
+            boundMode = mode
+            binding.enforcementStrict.isSelected = mode == EnforcementMode.STRICT
+            binding.enforcementOnce.isSelected = mode == EnforcementMode.ONCE_PER_VISIT
+        }
+
         fun bind(
             item: ManagedItem,
             policy: BlockedItemPolicy,
@@ -47,35 +55,33 @@ class ManagedItemsAdapter(
             binding.removeButton.setOnClickListener { onRemoveClicked(item) }
 
             updatingFromCode = true
-            when (policy.enforcementMode) {
-                EnforcementMode.STRICT -> binding.enforcementToggle.check(binding.enforcementStrict.id)
-                EnforcementMode.ONCE_PER_VISIT -> binding.enforcementToggle.check(binding.enforcementOnce.id)
-            }
+            selectEnforcement(policy.enforcementMode)
             binding.confessionSwitch.isChecked = policy.confessionEnabled
             updatingFromCode = false
 
-            binding.enforcementToggle.clearOnButtonCheckedListeners()
-            binding.enforcementToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
-                if (updatingFromCode || !isChecked) return@addOnButtonCheckedListener
-                val itemId = boundItemId ?: return@addOnButtonCheckedListener
-                val mode = when (checkedId) {
-                    binding.enforcementOnce.id -> EnforcementMode.ONCE_PER_VISIT
-                    else -> EnforcementMode.STRICT
-                }
+            binding.enforcementStrict.setOnClickListener {
+                if (updatingFromCode) return@setOnClickListener
+                val itemId = boundItemId ?: return@setOnClickListener
+                selectEnforcement(EnforcementMode.STRICT)
                 onPolicyChanged(
                     itemId,
-                    BlockedItemPolicy(mode, binding.confessionSwitch.isChecked),
+                    BlockedItemPolicy(EnforcementMode.STRICT, binding.confessionSwitch.isChecked),
+                )
+            }
+            binding.enforcementOnce.setOnClickListener {
+                if (updatingFromCode) return@setOnClickListener
+                val itemId = boundItemId ?: return@setOnClickListener
+                selectEnforcement(EnforcementMode.ONCE_PER_VISIT)
+                onPolicyChanged(
+                    itemId,
+                    BlockedItemPolicy(EnforcementMode.ONCE_PER_VISIT, binding.confessionSwitch.isChecked),
                 )
             }
 
             binding.confessionSwitch.setOnCheckedChangeListener { _, isChecked ->
                 if (updatingFromCode) return@setOnCheckedChangeListener
                 val itemId = boundItemId ?: return@setOnCheckedChangeListener
-                val mode = when (binding.enforcementToggle.checkedButtonId) {
-                    binding.enforcementOnce.id -> EnforcementMode.ONCE_PER_VISIT
-                    else -> EnforcementMode.STRICT
-                }
-                onPolicyChanged(itemId, BlockedItemPolicy(mode, isChecked))
+                onPolicyChanged(itemId, BlockedItemPolicy(boundMode, isChecked))
             }
         }
     }
