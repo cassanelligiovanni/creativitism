@@ -1,5 +1,6 @@
 package com.creativitism.appredirector
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -70,5 +71,50 @@ class SchedulePolicyTest {
         )
 
         assertFalse(SchedulePolicy.isArmed(schedule, minuteOfDay = 12 * 60, weekdayMonday0 = 0))
+    }
+
+    @Test
+    fun `resume label before same-day window start`() {
+        val schedule = ActiveHours(
+            enabled = true,
+            startMinuteOfDay = 9 * 60,
+            endMinuteOfDay = 18 * 60,
+            weekdaysBitmask = mondayOnly,
+        )
+
+        assertEquals(
+            "09:00",
+            SchedulePolicy.nextResumeLabel(schedule, minuteOfDay = 7 * 60, weekdayMonday0 = 0),
+        )
+    }
+
+    @Test
+    fun `resume label after same-day window wraps to next week`() {
+        val schedule = ActiveHours(
+            enabled = true,
+            startMinuteOfDay = 9 * 60,
+            endMinuteOfDay = 18 * 60,
+            weekdaysBitmask = mondayOnly,
+        )
+
+        assertEquals(
+            "09:00",
+            SchedulePolicy.nextResumeLabel(schedule, minuteOfDay = 20 * 60, weekdayMonday0 = 0),
+        )
+    }
+
+    @Test
+    fun `resume label during overnight daytime gap`() {
+        val schedule = ActiveHours(
+            enabled = true,
+            startMinuteOfDay = 22 * 60,
+            endMinuteOfDay = 6 * 60,
+            weekdaysBitmask = 0,
+        )
+
+        assertEquals(
+            "22:00",
+            SchedulePolicy.nextResumeLabel(schedule, minuteOfDay = 12 * 60, weekdayMonday0 = 0),
+        )
     }
 }

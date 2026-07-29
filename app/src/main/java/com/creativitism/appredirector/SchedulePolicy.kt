@@ -22,7 +22,7 @@ object SchedulePolicy {
     fun nextResumeLabel(schedule: ActiveHours, minuteOfDay: Int, weekdayMonday0: Int): String? {
         if (!schedule.enabled || isArmed(schedule, minuteOfDay, weekdayMonday0)) return null
 
-        for (daysAhead in 0..6) {
+        for (daysAhead in 0..7) {
             val day = (weekdayMonday0 + daysAhead) % 7
             if (!isDayActive(schedule.weekdaysBitmask, day)) continue
 
