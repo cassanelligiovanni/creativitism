@@ -27,6 +27,20 @@ class ScheduleStore(
             .apply()
     }
 
+    fun weekdayBitmaskFromSelection(selectedDaysMonday0: Set<Int>): Int =
+        if (selectedDaysMonday0.isEmpty()) {
+            DEFAULT_WEEKDAYS
+        } else {
+            selectedDaysMonday0.fold(0) { acc, day -> acc or (1 shl day) }
+        }
+
+    fun selectedWeekdaysMonday0(bitmask: Int): Set<Int> =
+        if (bitmask == DEFAULT_WEEKDAYS) {
+            emptySet()
+        } else {
+            (0..6).filter { day -> (bitmask and (1 shl day)) != 0 }.toSet()
+        }
+
     companion object {
         private const val PREFS_NAME = "active_hours"
         private const val KEY_ENABLED = "enabled"

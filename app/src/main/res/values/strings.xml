@@ -92,4 +92,20 @@
     <string name="notification_title">Creativitism is protecting you</string>
     <string name="notification_text">Blocked apps will pause before opening.</string>
     <string name="notification_text_dormant">dormant — protection resumes at %1$s</string>
+
+    <!-- Active hours -->
+    <string name="active_hours_title">Active hours</string>
+    <string name="active_hours_subtitle">Only block apps during this window (optional weekdays)</string>
+    <string name="active_hours_start">Start</string>
+    <string name="active_hours_end">End</string>
+    <string name="active_hours_all_days">Leave weekdays empty for every day</string>
+    <string name="schedule_status_armed">armed — blocking is active now</string>
+    <string name="schedule_status_dormant">dormant — protection resumes at %1$s</string>
+    <string name="weekday_mon" translatable="false">M</string>
+    <string name="weekday_tue" translatable="false">T</string>
+    <string name="weekday_wed" translatable="false">W</string>
+    <string name="weekday_thu" translatable="false">T</string>
+    <string name="weekday_fri" translatable="false">F</string>
+    <string name="weekday_sat" translatable="false">S</string>
+    <string name="weekday_sun" translatable="false">S</string>
 </resources>

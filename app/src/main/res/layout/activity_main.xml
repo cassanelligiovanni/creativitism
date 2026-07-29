@@ -101,6 +101,211 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="14dp"
+                android:background="@color/cv_border" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/active_hours_title"
+                        android:textColor="@color/cv_text"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/active_hours_subtitle"
+                        android:textColor="@color/cv_text_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/activeHoursSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/activeHoursControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/startTimeButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/active_hours_start"
+                        android:textColor="@color/cv_text"
+                        app:cornerRadius="14dp"
+                        app:strokeColor="@color/cv_border" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/endTimeButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/active_hours_end"
+                        android:textColor="@color/cv_text"
+                        app:cornerRadius="14dp"
+                        app:strokeColor="@color/cv_border" />
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/weekdayChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    app:chipSpacingHorizontal="6dp"
+                    app:singleLine="true"
+                    app:singleSelection="false">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipMon"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/weekday_mon"
+                        android:textColor="@color/cv_text"
+                        app:chipBackgroundColor="@color/cv_surface"
+                        app:chipStrokeColor="@color/cv_border"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipTue"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/weekday_tue"
+                        android:textColor="@color/cv_text"
+                        app:chipBackgroundColor="@color/cv_surface"
+                        app:chipStrokeColor="@color/cv_border"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipWed"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/weekday_wed"
+                        android:textColor="@color/cv_text"
+                        app:chipBackgroundColor="@color/cv_surface"
+                        app:chipStrokeColor="@color/cv_border"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipThu"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/weekday_thu"
+                        android:textColor="@color/cv_text"
+                        app:chipBackgroundColor="@color/cv_surface"
+                        app:chipStrokeColor="@color/cv_border"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipFri"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/weekday_fri"
+                        android:textColor="@color/cv_text"
+                        app:chipBackgroundColor="@color/cv_surface"
+                        app:chipStrokeColor="@color/cv_border"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipSat"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/weekday_sat"
+                        android:textColor="@color/cv_text"
+                        app:chipBackgroundColor="@color/cv_surface"
+                        app:chipStrokeColor="@color/cv_border"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipSun"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/weekday_sun"
+                        android:textColor="@color/cv_text"
+                        app:chipBackgroundColor="@color/cv_surface"
+                        app:chipStrokeColor="@color/cv_border"
+                        app:chipStrokeWidth="1dp" />
+                </com.google.android.material.chip.ChipGroup>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/inter"
+                    android:text="@string/active_hours_all_days"
+                    android:textColor="@color/cv_text_dim"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/scheduleStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/inter"
+                    android:textColor="@color/cv_escape"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    tools:text="armed — blocking is active now"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/accessibilityPermissionButton"
                 style="@style/Widget.Material3.Button.OutlinedButton"

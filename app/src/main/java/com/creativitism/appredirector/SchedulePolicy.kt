@@ -57,9 +57,11 @@ object SchedulePolicy {
         }
     }
 
-    private fun formatMinute(minute: Int): String {
+    fun formatMinuteOfDay(minute: Int): String {
         val hours = minute / 60
         val minutes = minute % 60
         return "%02d:%02d".format(hours, minutes)
     }
+
+    private fun formatMinute(minute: Int): String = formatMinuteOfDay(minute)
 }

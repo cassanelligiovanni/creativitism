@@ -11,6 +11,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.EditText
@@ -21,6 +23,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.creativitism.appredirector.databinding.ActivityMainBinding
+import com.google.android.material.chip.Chip
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
+import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,13 +40,41 @@ class MainActivity : AppCompatActivity() {
     private lateinit var allowanceManager: TemporaryAllowanceManager
     private lateinit var visitTracker: VisitTracker
     private lateinit var settingsStore: AppSettingsStore
+    private lateinit var scheduleStore: ScheduleStore
 
     private var allApps: List<AppInfo> = emptyList()
     private var searchQuery: String = ""
+    private var activeHours: ActiveHours = ActiveHours(
+        enabled = false,
+        startMinuteOfDay = 9 * 60,
+        endMinuteOfDay = 18 * 60,
+        weekdaysBitmask = 0,
+    )
 
     // True while updatePermissionUI() sets the switch programmatically, so the
     // change listener only reacts to real user taps.
     private var updatingSwitchFromCode = false
+    private var updatingScheduleFromCode = false
+
+    private val scheduleStatusHandler = Handler(Looper.getMainLooper())
+    private val scheduleStatusRunnable = object : Runnable {
+        override fun run() {
+            updateScheduleStatus()
+            scheduleStatusHandler.postDelayed(this, 30_000L)
+        }
+    }
+
+    private val weekdayChips: List<Pair<Chip, Int>> by lazy {
+        listOf(
+            binding.chipMon to 0,
+            binding.chipTue to 1,
+            binding.chipWed to 2,
+            binding.chipThu to 3,
+            binding.chipFri to 4,
+            binding.chipSat to 5,
+            binding.chipSun to 6,
+        )
+    }
 
     private val appStatePrefs by lazy {
         getSharedPreferences("app_state", Context.MODE_PRIVATE)
@@ -57,14 +91,24 @@ class MainActivity : AppCompatActivity() {
         allowanceManager = TemporaryAllowanceManager(this)
         visitTracker = VisitTracker(this)
         settingsStore = AppSettingsStore(this)
+        scheduleStore = ScheduleStore(this)
+        activeHours = scheduleStore.load()
 
         setupUI()
         loadAllData()
     }
 
+    override fun onPause() {
+        super.onPause()
+        scheduleStatusHandler.removeCallbacks(scheduleStatusRunnable)
+    }
+
     override fun onResume() {
         super.onResume()
         updatePermissionUI()
+        refreshActiveHoursUI()
+        scheduleStatusHandler.removeCallbacks(scheduleStatusRunnable)
+        scheduleStatusHandler.post(scheduleStatusRunnable)
     }
 
     private fun setupUI() {
@@ -126,6 +170,98 @@ class MainActivity : AppCompatActivity() {
         binding.resumeLastWorkSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (updatingSwitchFromCode) return@setOnCheckedChangeListener
             settingsStore.resumeLastWork = isChecked
+        }
+        setupActiveHoursUI()
+    }
+
+    private fun setupActiveHoursUI() {
+        binding.activeHoursSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (updatingScheduleFromCode) return@setOnCheckedChangeListener
+            activeHours = activeHours.copy(enabled = isChecked)
+            persistActiveHours()
+            refreshActiveHoursUI()
+        }
+        binding.startTimeButton.setOnClickListener { showTimePicker(isStart = true) }
+        binding.endTimeButton.setOnClickListener { showTimePicker(isStart = false) }
+        weekdayChips.forEach { (chip, _) ->
+            chip.setOnCheckedChangeListener { _, _ -> onWeekdaySelectionChanged() }
+        }
+        refreshActiveHoursUI()
+    }
+
+    private fun showTimePicker(isStart: Boolean) {
+        val minute = if (isStart) activeHours.startMinuteOfDay else activeHours.endMinuteOfDay
+        val picker = MaterialTimePicker.Builder()
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setHour(minute / 60)
+            .setMinute(minute % 60)
+            .setTitleText(
+                getString(if (isStart) R.string.active_hours_start else R.string.active_hours_end),
+            )
+            .build()
+        picker.addOnPositiveButtonClickListener {
+            val newMinute = picker.hour * 60 + picker.minute
+            activeHours = if (isStart) {
+                activeHours.copy(startMinuteOfDay = newMinute)
+            } else {
+                activeHours.copy(endMinuteOfDay = newMinute)
+            }
+            persistActiveHours()
+            refreshActiveHoursUI()
+        }
+        picker.show(supportFragmentManager, if (isStart) "start_time_picker" else "end_time_picker")
+    }
+
+    private fun onWeekdaySelectionChanged() {
+        if (updatingScheduleFromCode) return
+        val selected = weekdayChips.filter { it.first.isChecked }.map { it.second }.toSet()
+        activeHours = activeHours.copy(
+            weekdaysBitmask = scheduleStore.weekdayBitmaskFromSelection(selected),
+        )
+        persistActiveHours()
+        updateScheduleStatus()
+    }
+
+    private fun persistActiveHours() {
+        scheduleStore.save(activeHours)
+    }
+
+    private fun refreshActiveHoursUI() {
+        updatingScheduleFromCode = true
+        binding.activeHoursSwitch.isChecked = activeHours.enabled
+        binding.startTimeButton.text = getString(
+            R.string.active_hours_start,
+        ) + " · " + SchedulePolicy.formatMinuteOfDay(activeHours.startMinuteOfDay)
+        binding.endTimeButton.text = getString(
+            R.string.active_hours_end,
+        ) + " · " + SchedulePolicy.formatMinuteOfDay(activeHours.endMinuteOfDay)
+        syncWeekdayChips(activeHours.weekdaysBitmask)
+        updatingScheduleFromCode = false
+        updateScheduleStatus()
+    }
+
+    private fun syncWeekdayChips(bitmask: Int) {
+        val selected = scheduleStore.selectedWeekdaysMonday0(bitmask)
+        weekdayChips.forEach { (chip, day) ->
+            chip.isChecked = selected.contains(day)
+        }
+    }
+
+    private fun updateScheduleStatus() {
+        if (!activeHours.enabled) {
+            binding.scheduleStatusText.visibility = android.view.View.GONE
+            return
+        }
+        binding.scheduleStatusText.visibility = android.view.View.VISIBLE
+        val now = LocalDateTime.now()
+        val minuteOfDay = now.hour * 60 + now.minute
+        val weekdayMonday0 = now.dayOfWeek.value - 1
+        val armed = SchedulePolicy.isArmed(activeHours, minuteOfDay, weekdayMonday0)
+        binding.scheduleStatusText.text = if (armed) {
+            getString(R.string.schedule_status_armed)
+        } else {
+            val resume = SchedulePolicy.nextResumeLabel(activeHours, minuteOfDay, weekdayMonday0)
+            getString(R.string.schedule_status_dormant, resume ?: "--:--")
         }
     }
 
