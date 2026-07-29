@@ -7,10 +7,13 @@ import android.content.SharedPreferences
  * Persists per-package temporary allowances ("use it for 5 minutes") so both the
  * interstitial and the monitoring service see the same state.
  */
-class TemporaryAllowanceManager(context: Context) {
+class TemporaryAllowanceManager(
+    private val prefs: SharedPreferences,
+) {
 
-    private val prefs: SharedPreferences =
-        context.getSharedPreferences("temporary_allowances", Context.MODE_PRIVATE)
+    constructor(context: Context) : this(
+        context.getSharedPreferences("temporary_allowances", Context.MODE_PRIVATE),
+    )
 
     fun grant(packageName: String, now: Long = System.currentTimeMillis()) =
         grantStrict(packageName, now)
