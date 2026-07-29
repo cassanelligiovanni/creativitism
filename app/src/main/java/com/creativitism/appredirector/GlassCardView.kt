@@ -16,11 +16,9 @@ import eightbitlab.com.blurview.BlurTarget
 import eightbitlab.com.blurview.BlurView
 
 /**
- * A glassmorphism card: real-time blur of the content behind it (BlurView v3, needs a
- * BlurTarget sibling with id R.id.blurTarget in the hierarchy), a translucent tint,
- * and a hand-drawn gradient rim that is brighter at the top edge. XML children are
- * transparently re-parented into the internal BlurView. If blur setup fails, the card
- * degrades to a darker frosted tint so text stays readable.
+ * Smoked glass card: blur of the aurora behind + a dark warm overlay (not milky white).
+ * White frost reads as steamy grey on real phone GPUs; charcoal tint keeps the
+ * emulator's deeper look. Falls back to nearly-opaque charcoal if blur fails.
  */
 class GlassCardView @JvmOverloads constructor(
     context: Context,
@@ -40,7 +38,6 @@ class GlassCardView @JvmOverloads constructor(
         color = GLASS_TINT
     }
     private var blurSetupDone = false
-    private var blurred = false
 
     init {
         blurView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
@@ -73,8 +70,8 @@ class GlassCardView @JvmOverloads constructor(
             val windowBackground = (context as? Activity)?.window?.decorView?.background
             blurView.setupWith(target)
                 .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(18f)
-            blurred = true
+                .setBlurRadius(22f)
+                .setOverlayColor(BLUR_OVERLAY)
         } catch (t: Throwable) {
             tintPaint.color = FALLBACK_TINT
         }
@@ -98,9 +95,11 @@ class GlassCardView @JvmOverloads constructor(
     }
 
     private companion object {
-        const val GLASS_TINT: Int = 0x14FFFFFF
-        const val RIM_TOP: Int = 0x3DFFFFFF
-        const val RIM_BOTTOM: Int = 0x0AFFFFFF
-        val FALLBACK_TINT: Int = 0xD814100E.toInt()
+        // Dark smoked charcoal overlays — keep phone glass deep like the emulator.
+        val BLUR_OVERLAY: Int = 0xA80E0B09.toInt()
+        val GLASS_TINT: Int = 0x33110C0A
+        val FALLBACK_TINT: Int = 0xE60E0B09.toInt()
+        const val RIM_TOP: Int = 0x2AFFFFFF
+        const val RIM_BOTTOM: Int = 0x08FFFFFF
     }
 }

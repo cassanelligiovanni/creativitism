@@ -44,10 +44,10 @@ class AuroraView @JvmOverloads constructor(
     private val basePaint = Paint()
 
     private val blobs = listOf(
-        Blob(0.12f, 0.02f, 440f, 0x4DFF6A3D.toInt(), 0.045f, 0.030f, 46_000L, 0.0f),
-        Blob(0.95f, 0.16f, 480f, 0x40E5484D.toInt(), -0.055f, 0.035f, 52_000L, 1.3f),
-        Blob(0.88f, 0.72f, 360f, 0x21FFB25E.toInt(), -0.035f, -0.045f, 60_000L, 2.1f),
-        Blob(0.42f, 1.05f, 580f, 0x367A2E4D.toInt(), 0.050f, -0.020f, 50_000L, 3.7f),
+        Blob(0.12f, 0.02f, 440f, 0x33FF6A3D.toInt(), 0.045f, 0.030f, 46_000L, 0.0f),
+        Blob(0.95f, 0.16f, 480f, 0x2AE5484D.toInt(), -0.055f, 0.035f, 52_000L, 1.3f),
+        Blob(0.88f, 0.72f, 360f, 0x18FFB25E.toInt(), -0.035f, -0.045f, 60_000L, 2.1f),
+        Blob(0.42f, 1.05f, 580f, 0x247A2E4D.toInt(), 0.050f, -0.020f, 50_000L, 3.7f),
     )
 
     private val frameMs = 64L
@@ -64,7 +64,7 @@ class AuroraView @JvmOverloads constructor(
         super.onSizeChanged(w, h, oldw, oldh)
         basePaint.shader = LinearGradient(
             0f, 0f, 0f, h.toFloat(),
-            intArrayOf(0xFF1D1310.toInt(), 0xFF120D0B.toInt(), 0xFF0E0B0A.toInt()),
+            intArrayOf(0xFF14100D.toInt(), 0xFF0A0706.toInt(), 0xFF070504.toInt()),
             floatArrayOf(0f, 0.5f, 1f),
             Shader.TileMode.CLAMP,
         )

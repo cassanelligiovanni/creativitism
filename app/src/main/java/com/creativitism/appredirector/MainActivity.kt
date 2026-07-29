@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var interventionLog: InterventionLog
 
     private var allApps: List<AppInfo> = emptyList()
+    private var allAppsLoaded = false
+    private var loadingAllApps = false
     private var searchQuery: String = ""
     private var activeHours: ActiveHours = ActiveHours(
         enabled = false,
@@ -211,6 +213,9 @@ class MainActivity : AppCompatActivity() {
                 otherContent.visibility =
                     if (selected) android.view.View.VISIBLE else android.view.View.GONE
             }
+            if (tab === binding.tabLists) {
+                ensureAllAppsLoaded()
+            }
         }
         tabs.forEach { (tab, content) ->
             tab.setOnClickListener {
@@ -219,6 +224,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
         select(binding.tabGuard)
+    }
+
+    /**
+     * Package-manager enumeration + icon decode is expensive. Defer it until Lists
+     * is opened, and do the work off the main thread so the tab switch stays snappy.
+     */
+    private fun ensureAllAppsLoaded() {
+        if (allAppsLoaded || loadingAllApps) {
+            if (allAppsLoaded) refreshAllAppsList()
+            return
+        }
+        loadingAllApps = true
+        Thread {
+            val apps = appListManager.getInstalledApps()
+            runOnUiThread {
+                allApps = apps
+                allAppsLoaded = true
+                loadingAllApps = false
+                refreshManagedLists()
+                refreshAllAppsList()
+            }
+        }.start()
     }
 
     private fun setupActiveHoursUI() {
@@ -387,11 +414,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadAllData() {
-        allApps = appListManager.getInstalledApps()
+        refreshManagedLists()
+        if (allAppsLoaded) {
+            refreshAllAppsList()
+        }
+    }
+
+    private fun refreshManagedLists() {
         val soulSuckingIds = redirectionManager.getSoulSuckingItems()
         val creativeIds = redirectionManager.getCreativityBoostingItems()
-
-        refreshAllAppsList()
 
         val soulSuckingItems = soulSuckingIds.map { id -> toManagedItem(id) }
             .sortedBy { it.displayName.lowercase() }
@@ -407,16 +438,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toManagedItem(id: String): ManagedItem {
-        val app = allApps.find { it.packageName == id }
+        val app = allApps.find { it.packageName == id } ?: appListManager.getAppInfo(id)
         return if (app != null) {
             ManagedItem(id, app.appName, app.icon, true)
-        } else { // It's a website
+        } else {
+            // Website (or uninstalled package) — globe fallback.
             val icon = ContextCompat.getDrawable(this, R.drawable.ic_globe)!!
             ManagedItem(id, id, icon, false)
         }
     }
 
     private fun refreshAllAppsList() {
+        if (!allAppsLoaded) return
         val soulSuckingIds = redirectionManager.getSoulSuckingItems()
         val creativeIds = redirectionManager.getCreativityBoostingItems()
         val availableApps = allApps

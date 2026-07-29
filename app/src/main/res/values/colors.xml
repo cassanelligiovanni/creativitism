@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Ember glass palette: deep warm charcoal + amber/coral aurora -->
+    <!-- Ember glass palette: deep smoked charcoal — dark glass, not milky white -->
 
-    <color name="cv_bg">#0E0B0A</color>
-    <color name="cv_surface">#1B1512</color>
-    <color name="cv_card">#14100E</color>
+    <color name="cv_bg">#070504</color>
+    <color name="cv_surface">#12100E</color>
+    <color name="cv_card">#0E0B09</color>
     <color name="cv_text">#FAF4EC</color>
-    <color name="cv_text_secondary">#B8AA9E</color>
-    <color name="cv_text_dim">#7E7268</color>
+    <color name="cv_text_secondary">#A8998C</color>
+    <color name="cv_text_dim">#6F645C</color>
     <color name="cv_blocked">#FF6E63</color>
     <color name="cv_creative">#FFC25E</color>
     <color name="cv_escape">#FFB25E</color>
-    <color name="cv_border">#2EFFFFFF</color>
+    <color name="cv_border">#22FFFFFF</color>
 
-    <!-- Glass tints -->
-    <color name="cv_glass_fill">#14FFFFFF</color>
-    <color name="cv_glass_overlay">#10FFFFFF</color>
-    <color name="cv_glass_fallback">#D814100E</color>
-    <color name="cv_glass_rim_top">#3DFFFFFF</color>
-    <color name="cv_glass_rim_bottom">#0AFFFFFF</color>
+    <!-- Dark smoked glass (not white frost — white reads steamy grey on phones) -->
+    <color name="cv_glass_fill">#A80E0B09</color>
+    <color name="cv_glass_overlay">#99110C0A</color>
+    <color name="cv_glass_fallback">#E60E0B09</color>
+    <color name="cv_glass_rim_top">#2AFFFFFF</color>
+    <color name="cv_glass_rim_bottom">#08FFFFFF</color>
 
     <!-- Semantic error (dialogs, destructive) -->
     <color name="cv_error">#FF6E63</color>

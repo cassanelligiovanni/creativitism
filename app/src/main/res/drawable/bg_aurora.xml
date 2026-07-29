@@ -6,14 +6,14 @@
         <shape android:shape="rectangle">
             <gradient
                 android:angle="270"
-                android:startColor="#1D1310"
-                android:centerColor="#120D0B"
-                android:endColor="#0E0B0A"
+                android:startColor="#14100D"
+                android:centerColor="#0A0706"
+                android:endColor="#070504"
                 android:type="linear" />
         </shape>
     </item>
 
-    <!-- Ember blob, top-left -->
+    <!-- Ember blob, top-left (muted for phone GPUs) -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -21,8 +21,8 @@
                 android:centerX="0.12"
                 android:centerY="0.02"
                 android:gradientRadius="440dp"
-                android:startColor="#4DFF6A3D"
-                android:centerColor="#1AFF6A3D"
+                android:startColor="#33FF6A3D"
+                android:centerColor="#14FF6A3D"
                 android:endColor="#00FF6A3D" />
         </shape>
     </item>
@@ -35,8 +35,8 @@
                 android:centerX="0.95"
                 android:centerY="0.16"
                 android:gradientRadius="480dp"
-                android:startColor="#40E5484D"
-                android:centerColor="#17E5484D"
+                android:startColor="#2AE5484D"
+                android:centerColor="#12E5484D"
                 android:endColor="#00E5484D" />
         </shape>
     </item>
@@ -49,8 +49,8 @@
                 android:centerX="0.88"
                 android:centerY="0.72"
                 android:gradientRadius="360dp"
-                android:startColor="#21FFB25E"
-                android:centerColor="#0BFFB25E"
+                android:startColor="#18FFB25E"
+                android:centerColor="#08FFB25E"
                 android:endColor="#00FFB25E" />
         </shape>
     </item>
@@ -63,8 +63,8 @@
                 android:centerX="0.42"
                 android:centerY="1.05"
                 android:gradientRadius="580dp"
-                android:startColor="#367A2E4D"
-                android:centerColor="#147A2E4D"
+                android:startColor="#247A2E4D"
+                android:centerColor="#0E7A2E4D"
                 android:endColor="#007A2E4D" />
         </shape>
     </item>
