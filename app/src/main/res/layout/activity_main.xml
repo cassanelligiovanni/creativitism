@@ -174,7 +174,7 @@
                 android:layout_marginTop="4dp"
                 android:nestedScrollingEnabled="false"
                 tools:itemCount="2"
-                tools:listitem="@layout/item_managed_item" />
+                tools:listitem="@layout/item_blocked_row" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/addWebsiteButton"

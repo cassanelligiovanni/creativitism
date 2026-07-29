@@ -30,6 +30,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var soulSuckingAdapter: ManagedItemsAdapter
     private lateinit var creativityBoostingAdapter: ManagedItemsAdapter
+    private lateinit var policyStore: BlockedItemPolicyStore
+    private lateinit var allowanceManager: TemporaryAllowanceManager
+    private lateinit var visitTracker: VisitTracker
 
     private var allApps: List<AppInfo> = emptyList()
     private var searchQuery: String = ""
@@ -49,6 +52,9 @@ class MainActivity : AppCompatActivity() {
 
         appListManager = AppListManager(this)
         redirectionManager = RedirectionManager(this)
+        policyStore = BlockedItemPolicyStore(this)
+        allowanceManager = TemporaryAllowanceManager(this)
+        visitTracker = VisitTracker(this)
 
         setupUI()
         loadAllData()
@@ -64,19 +70,29 @@ class MainActivity : AppCompatActivity() {
         binding.creativityBoostingRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.allAppsRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        soulSuckingAdapter = ManagedItemsAdapter(emptyList()) { item ->
-            redirectionManager.removeSoulSuckingItem(item.id)
-            BlockedItemPolicyStore(this).remove(item.id)
-            TemporaryAllowanceManager(this).clear(item.id)
-            VisitTracker(this).endVisit(item.id)
-            loadAllData()
-        }
+        soulSuckingAdapter = ManagedItemsAdapter(
+            items = emptyList(),
+            rowMode = ManagedItemsAdapter.RowMode.BLOCKED,
+            onRemoveClicked = { item ->
+                redirectionManager.removeSoulSuckingItem(item.id)
+                policyStore.remove(item.id)
+                allowanceManager.clear(item.id)
+                visitTracker.endVisit(item.id)
+                loadAllData()
+            },
+            onPolicyChanged = { id, policy -> policyStore.set(id, policy) },
+            getPolicy = { id -> policyStore.get(id) },
+        )
         binding.soulSuckingRecyclerView.adapter = soulSuckingAdapter
 
-        creativityBoostingAdapter = ManagedItemsAdapter(emptyList()) { item ->
-            redirectionManager.removeCreativityBoostingItem(item.id)
-            loadAllData()
-        }
+        creativityBoostingAdapter = ManagedItemsAdapter(
+            items = emptyList(),
+            rowMode = ManagedItemsAdapter.RowMode.CREATIVE,
+            onRemoveClicked = { item ->
+                redirectionManager.removeCreativityBoostingItem(item.id)
+                loadAllData()
+            },
+        )
         binding.creativityBoostingRecyclerView.adapter = creativityBoostingAdapter
 
         binding.searchInput.doAfterTextChanged { text ->

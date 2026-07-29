@@ -25,6 +25,9 @@
     <string name="add_website">Block a website</string>
     <string name="add_creative_website">Add a creative site</string>
     <string name="remove_item">Remove from list</string>
+    <string name="enforcement_strict">Strict</string>
+    <string name="enforcement_once">Once</string>
+    <string name="confession_toggle">Confession</string>
     <string name="add_to_creative">Add to Creative</string>
     <string name="add_to_blocked">Add to Blocked</string>
 
