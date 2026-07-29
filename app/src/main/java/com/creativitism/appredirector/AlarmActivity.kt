@@ -210,14 +210,26 @@ class AlarmActivity : AppCompatActivity() {
                 kind = InterventionKind.ALLOWANCE_GRANTED,
             ),
         )
-        val launchIntent = packageManager.getLaunchIntentForPackage(item)?.apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        if (launchIntent != null) {
-            startActivity(launchIntent)
+        if (itemLooksLikeDomain(item)) {
+            // Prefer finish() so Chrome underneath resurfaces; relaunch if needed.
+            packageManager.getLaunchIntentForPackage("com.android.chrome")?.let {
+                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                startActivity(it)
+            }
+        } else {
+            packageManager.getLaunchIntentForPackage(item)?.let {
+                startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
         }
         finish()
     }
+
+    /**
+     * Website entries are host-like ids (e.g. "instagram.com") and do not resolve to
+     * an installed-package launcher; app entries do.
+     */
+    private fun itemLooksLikeDomain(item: String): Boolean =
+        item.contains('.') && packageManager.getLaunchIntentForPackage(item) == null
 
     private fun goHome() {
         val homeIntent = Intent(Intent.ACTION_MAIN).apply {

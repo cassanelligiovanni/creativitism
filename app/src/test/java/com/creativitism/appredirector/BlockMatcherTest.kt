@@ -1,6 +1,8 @@
 package com.creativitism.appredirector
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -34,5 +36,29 @@ class BlockMatcherTest {
     @Test
     fun `empty block list matches nothing`() {
         assertFalse(BlockMatcher.matches("com.instagram.android", emptySet()))
+    }
+
+    @Test
+    fun `resolve returns canonical domain entry`() {
+        assertEquals(
+            "instagram.com",
+            BlockMatcher.resolve("https://www.instagram.com/reels", setOf("instagram.com", "reddit.com")),
+        )
+    }
+
+    @Test
+    fun `resolve prefers longest matching domain`() {
+        assertEquals(
+            "www.instagram.com",
+            BlockMatcher.resolve(
+                "https://www.instagram.com/reels",
+                setOf("instagram.com", "www.instagram.com"),
+            ),
+        )
+    }
+
+    @Test
+    fun `resolve returns null when nothing matches`() {
+        assertNull(BlockMatcher.resolve("https://wikipedia.org", setOf("instagram.com")))
     }
 }
