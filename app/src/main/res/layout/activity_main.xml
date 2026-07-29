@@ -53,6 +53,68 @@
             android:textColor="@color/cv_text_secondary"
             android:textSize="14sp" />
 
+        <!-- Weekly receipt (shown when a week boundary is crossed) -->
+        <LinearLayout
+            android:id="@+id/receiptCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/bg_glass"
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:text="@string/receipt_title"
+                android:textColor="@color/cv_creative"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/receiptCopyText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/inter"
+                android:textColor="@color/cv_text"
+                android:textSize="16sp"
+                tools:text="This week you traded 25 minutes of scrolling for time in your Creative apps." />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/receiptShareButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/inter"
+                    android:text="@string/receipt_share"
+                    android:textColor="@color/cv_creative"
+                    app:cornerRadius="14dp"
+                    app:strokeColor="@color/cv_creative" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/receiptDismissButton"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/inter"
+                    android:text="@string/receipt_dismiss"
+                    android:textColor="@color/cv_text_secondary" />
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- Protection pane -->
         <LinearLayout
             android:id="@+id/statusCard"
@@ -501,6 +563,174 @@
                 android:textColor="@color/cv_creative"
                 app:icon="@drawable/ic_globe"
                 app:iconTint="@color/cv_creative" />
+        </LinearLayout>
+
+        <!-- Stats pane -->
+        <LinearLayout
+            android:id="@+id/statsCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_glass"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:text="@string/stats_title"
+                android:textColor="@color/cv_text"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:fontFamily="@font/inter"
+                android:text="@string/stats_subtitle"
+                android:textColor="@color/cv_text_secondary"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/stats_reclaimed"
+                        android:textColor="@color/cv_text_dim"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/statsReclaimedText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:textColor="@color/cv_creative"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="25 minutes" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/stats_bought"
+                        android:textColor="@color/cv_text_dim"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/statsBoughtText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:textColor="@color/cv_blocked"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="10 minutes" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/stats_alarms_today"
+                        android:textColor="@color/cv_text_dim"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/statsAlarmsTodayText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:textColor="@color/cv_text"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="3" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="@string/stats_streak"
+                        android:textColor="@color/cv_text_dim"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/statsStreakText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:textColor="@color/cv_escape"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="4 days" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/inter"
+                android:text="@string/stats_offenders_title"
+                android:textColor="@color/cv_text"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/statsOffendersText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/inter"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/cv_text_secondary"
+                android:textSize="13sp"
+                tools:text="Instagram · 5\nTikTok · 2" />
         </LinearLayout>
 
         <!-- All apps pane -->

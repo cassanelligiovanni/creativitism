@@ -26,6 +26,7 @@ import com.creativitism.appredirector.databinding.ActivityMainBinding
 import com.google.android.material.chip.Chip
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var visitTracker: VisitTracker
     private lateinit var settingsStore: AppSettingsStore
     private lateinit var scheduleStore: ScheduleStore
+    private lateinit var interventionLog: InterventionLog
 
     private var allApps: List<AppInfo> = emptyList()
     private var searchQuery: String = ""
@@ -50,6 +52,8 @@ class MainActivity : AppCompatActivity() {
         endMinuteOfDay = 18 * 60,
         weekdaysBitmask = 0,
     )
+    private var pendingReceiptWeekId: String? = null
+    private var pendingReceiptCopy: String? = null
 
     // True while updatePermissionUI() sets the switch programmatically, so the
     // change listener only reacts to real user taps.
@@ -92,6 +96,7 @@ class MainActivity : AppCompatActivity() {
         visitTracker = VisitTracker(this)
         settingsStore = AppSettingsStore(this)
         scheduleStore = ScheduleStore(this)
+        interventionLog = InterventionLog(this)
         activeHours = scheduleStore.load()
 
         setupUI()
@@ -107,6 +112,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         updatePermissionUI()
         refreshActiveHoursUI()
+        refreshStatsAndReceipt()
         scheduleStatusHandler.removeCallbacks(scheduleStatusRunnable)
         scheduleStatusHandler.post(scheduleStatusRunnable)
     }
@@ -171,6 +177,8 @@ class MainActivity : AppCompatActivity() {
             if (updatingSwitchFromCode) return@setOnCheckedChangeListener
             settingsStore.resumeLastWork = isChecked
         }
+        binding.receiptShareButton.setOnClickListener { shareWeeklyReceipt() }
+        binding.receiptDismissButton.setOnClickListener { dismissWeeklyReceipt() }
         setupActiveHoursUI()
     }
 
@@ -263,6 +271,77 @@ class MainActivity : AppCompatActivity() {
             val resume = SchedulePolicy.nextResumeLabel(activeHours, minuteOfDay, weekdayMonday0)
             getString(R.string.schedule_status_dormant, resume ?: "--:--")
         }
+    }
+
+    private fun refreshStatsAndReceipt() {
+        val today = LocalDate.now()
+        val events = interventionLog.all()
+        val snapshot = StatsAggregator.aggregate(events, today)
+        bindStats(snapshot, today)
+        maybeShowWeeklyReceipt(events, today)
+    }
+
+    private fun bindStats(snapshot: StatsSnapshot, today: LocalDate) {
+        binding.statsReclaimedText.text = formatStatsDuration(snapshot.reclaimedMillis)
+        binding.statsBoughtText.text = formatStatsDuration(snapshot.boughtMillis)
+        val alarmsToday = snapshot.alarmsByDay[today.toString()] ?: 0
+        binding.statsAlarmsTodayText.text = getString(R.string.stats_alarms_count, alarmsToday)
+        binding.statsStreakText.text =
+            getString(R.string.stats_streak_days, snapshot.giveInFreeStreakDays)
+        binding.statsOffendersText.text = if (snapshot.worstOffenders.isEmpty()) {
+            getString(R.string.stats_offenders_empty)
+        } else {
+            snapshot.worstOffenders.take(5).joinToString("\n") { (label, count) ->
+                getString(R.string.stats_offender_row, label, count)
+            }
+        }
+    }
+
+    private fun formatStatsDuration(millis: Long): String =
+        if (millis <= 0L) {
+            getString(R.string.stats_duration_zero)
+        } else {
+            WeeklyReceiptHelper.formatDuration(millis)
+        }
+
+    private fun maybeShowWeeklyReceipt(events: List<InterventionEvent>, today: LocalDate) {
+        val previousWeekId = WeeklyReceiptHelper.previousWeekId(today)
+        val priorWeekEvents = WeeklyReceiptHelper.eventsInWeek(events, previousWeekId)
+        if (!WeeklyReceiptHelper.shouldShowReceipt(
+                settingsStore.lastReceiptWeekId,
+                previousWeekId,
+                priorWeekEvents,
+            )
+        ) {
+            binding.receiptCard.visibility = android.view.View.GONE
+            pendingReceiptWeekId = null
+            pendingReceiptCopy = null
+            return
+        }
+        val priorSnapshot = StatsAggregator.aggregate(priorWeekEvents, today.minusWeeks(1))
+        val copy = WeeklyReceiptHelper.receiptCopy(priorSnapshot.reclaimedMillis)
+        pendingReceiptWeekId = previousWeekId
+        pendingReceiptCopy = copy
+        binding.receiptCopyText.text = copy
+        binding.receiptCard.visibility = android.view.View.VISIBLE
+    }
+
+    private fun shareWeeklyReceipt() {
+        val copy = pendingReceiptCopy ?: return
+        val intent = WeeklyReceiptHelper.shareReceiptIntent(this, copy)
+        startActivity(Intent.createChooser(intent, getString(R.string.receipt_share_chooser)))
+        // Mark shown after explicit share; do not auto-share.
+        dismissWeeklyReceipt()
+    }
+
+    private fun dismissWeeklyReceipt() {
+        val weekId = pendingReceiptWeekId
+        if (weekId != null) {
+            settingsStore.lastReceiptWeekId = weekId
+        }
+        binding.receiptCard.visibility = android.view.View.GONE
+        pendingReceiptWeekId = null
+        pendingReceiptCopy = null
     }
 
     private fun loadAllData() {

@@ -108,4 +108,24 @@
     <string name="weekday_fri" translatable="false">F</string>
     <string name="weekday_sat" translatable="false">S</string>
     <string name="weekday_sun" translatable="false">S</string>
+
+    <!-- Stats -->
+    <string name="stats_title">Stats</string>
+    <string name="stats_subtitle">Local only — never leaves this phone</string>
+    <string name="stats_reclaimed">Time reclaimed</string>
+    <string name="stats_bought">Time bought</string>
+    <string name="stats_alarms_today">Alarms today</string>
+    <string name="stats_streak">Give-in-free streak</string>
+    <string name="stats_streak_days">%1$d days</string>
+    <string name="stats_alarms_count">%1$d</string>
+    <string name="stats_offenders_title">Worst offenders</string>
+    <string name="stats_offender_row">%1$s · %2$d</string>
+    <string name="stats_offenders_empty">No alarms yet</string>
+    <string name="stats_duration_zero">0 minutes</string>
+
+    <!-- Weekly receipt -->
+    <string name="receipt_title">Weekly trade</string>
+    <string name="receipt_share">Share</string>
+    <string name="receipt_dismiss">Dismiss</string>
+    <string name="receipt_share_chooser">Share your weekly trade</string>
 </resources>
