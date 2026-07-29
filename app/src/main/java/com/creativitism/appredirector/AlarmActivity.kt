@@ -81,7 +81,8 @@ class AlarmActivity : AppCompatActivity() {
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
         if (granted) {
-            speechHelper?.startListening()
+            // Permission sheet already stopped audio via onPause; keep silent for listen.
+            startSpeechListening()
         } else {
             fallBackToTypedOnly()
         }
@@ -289,14 +290,30 @@ class AlarmActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) ==
             PackageManager.PERMISSION_GRANTED
         ) {
-            speechHelper?.startListening()
+            startSpeechListening()
             return
         }
+        // Silence before disclosure/permission so speak paths match (permission sheet
+        // also stops via onPause; already-granted never pauses and must stop here).
+        silenceAlarmForSpeech()
         if (!micDisclosureShown) {
             showMicDisclosure()
         } else {
             requestMicPermission.launch(Manifest.permission.RECORD_AUDIO)
         }
+    }
+
+    /**
+     * Stop klaxon + vibe so SpeechRecognizer does not hear the alarm.
+     * Do not restart after listen — silence until escape/give-in is OK.
+     */
+    private fun silenceAlarmForSpeech() {
+        audio.stop()
+    }
+
+    private fun startSpeechListening() {
+        silenceAlarmForSpeech()
+        speechHelper?.startListening()
     }
 
     private fun showMicDisclosure() {
@@ -305,6 +322,7 @@ class AlarmActivity : AppCompatActivity() {
             .setTitle(R.string.confession_mic_disclosure_title)
             .setMessage(R.string.confession_mic_disclosure)
             .setPositiveButton(R.string.confession_mic_disclosure_continue) { _, _ ->
+                silenceAlarmForSpeech()
                 requestMicPermission.launch(Manifest.permission.RECORD_AUDIO)
             }
             .setNegativeButton(R.string.confession_mic_use_typed) { _, _ ->
