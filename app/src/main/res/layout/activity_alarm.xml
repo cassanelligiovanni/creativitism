@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cv_alarm_bg"
+    tools:context=".AlarmActivity">
+
+    <TextView
+        android:id="@+id/alarmTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="72dp"
+        android:fontFamily="@font/ibmplexserif_semibold"
+        android:includeFontPadding="false"
+        android:text="@string/alarm_title"
+        android:textColor="@color/cv_text"
+        android:textSize="48sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/alarmSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/plex_serif"
+        android:gravity="center"
+        android:paddingHorizontal="32dp"
+        android:textColor="@color/cv_text_secondary"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alarmTitle"
+        tools:text="You were opening Instagram." />
+
+    <TextView
+        android:id="@+id/alarmCountdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/plex_serif"
+        android:textColor="@color/cv_text"
+        android:textSize="140sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/alarmEscape"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alarmSubtitle"
+        app:layout_constraintVertical_bias="0.42"
+        tools:text="10" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/alarmEscape"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="26dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/cv_escape"
+        android:text="@string/alarm_escape"
+        android:textColor="@color/cv_bg"
+        android:textSize="16sp"
+        app:cornerRadius="28dp"
+        app:layout_constraintBottom_toTopOf="@id/alarmGiveIn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/alarmGiveIn"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="26dp"
+        android:layout_marginBottom="44dp"
+        android:enabled="false"
+        android:text="@string/alarm_givein_strict"
+        android:textColor="@color/cv_text_secondary"
+        android:textSize="16sp"
+        app:cornerRadius="26dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@color/cv_text_secondary" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

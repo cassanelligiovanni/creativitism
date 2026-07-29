@@ -61,6 +61,14 @@
     <string name="interstitial_redirect">Take me somewhere better</string>
     <string name="interstitial_allow">Use it for 5 minutes</string>
 
+    <!-- Alarm -->
+    <string name="alarm_title">STOP.</string>
+    <string name="alarm_subtitle">You were opening %1$s.</string>
+    <string name="alarm_subtitle_generic">You were opening a blocked app.</string>
+    <string name="alarm_escape">Escape</string>
+    <string name="alarm_givein_strict">Use it for 5 minutes</string>
+    <string name="alarm_givein_confession_placeholder">Say the trade…</string>
+
     <!-- Foreground service notification -->
     <string name="notification_channel_name">Protection service</string>
     <string name="notification_channel_description">Keeps watch for blocked apps</string>

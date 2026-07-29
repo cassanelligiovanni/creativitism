@@ -7,6 +7,7 @@ import android.app.Service
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.IBinder
 import android.os.SystemClock
@@ -24,16 +25,16 @@ class RedirectorService : Service() {
     private lateinit var appListManager: AppListManager
     private lateinit var allowanceManager: TemporaryAllowanceManager
 
-    // Last time (elapsedRealtime) the interstitial was launched, per package.
-    private val interstitialLaunchedAt = mutableMapOf<String, Long>()
+    // Last time (elapsedRealtime) the alarm was launched, per package.
+    private val alarmLaunchedAt = mutableMapOf<String, Long>()
 
     companion object {
         const val NOTIFICATION_ID = 1
         const val NOTIFICATION_CHANNEL_ID = "RedirectorServiceChannel"
 
-        // Don't relaunch the interstitial for the same package within this window,
+        // Don't relaunch the alarm for the same package within this window,
         // so the 500ms poll doesn't stack activities while it animates in.
-        private const val INTERSTITIAL_DEBOUNCE_MILLIS = 3_000L
+        private const val ALARM_DEBOUNCE_MILLIS = 3_000L
     }
 
     override fun onCreate() {
@@ -76,24 +77,32 @@ class RedirectorService : Service() {
     // Runs every tick (not only on foreground changes) so an expired 5-minute
     // allowance kicks the user out even while they stay inside the blocked app.
     private fun checkForegroundApp() {
-        // Usage stats lag behind for a few seconds after the interstitial covers a
+        // Usage stats lag behind for a few seconds after the alarm covers a
         // blocked app; relaunching it would restart the countdown.
-        if (BlockedInterstitialActivity.isShowing) return
+        if (AlarmActivity.isShowing) return
         val foregroundApp = getForegroundApp() ?: return
         if (foregroundApp == packageName) return
         if (!redirectionManager.isSoulSucking(foregroundApp)) return
         if (allowanceManager.isAllowed(foregroundApp)) return
 
         val now = SystemClock.elapsedRealtime()
-        val lastLaunch = interstitialLaunchedAt[foregroundApp] ?: 0L
-        if (now - lastLaunch < INTERSTITIAL_DEBOUNCE_MILLIS) return
-        interstitialLaunchedAt[foregroundApp] = now
+        val lastLaunch = alarmLaunchedAt[foregroundApp] ?: 0L
+        if (now - lastLaunch < ALARM_DEBOUNCE_MILLIS) return
+        alarmLaunchedAt[foregroundApp] = now
 
-        val interstitialIntent = Intent(this, BlockedInterstitialActivity::class.java).apply {
-            putExtra(BlockedInterstitialActivity.EXTRA_BLOCKED_PACKAGE, foregroundApp)
+        val alarmIntent = Intent(this, AlarmActivity::class.java).apply {
+            putExtra(AlarmActivity.EXTRA_BLOCKED_ITEM, foregroundApp)
+            putExtra(AlarmActivity.EXTRA_DISPLAY_NAME, resolveDisplayName(foregroundApp))
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        startActivity(interstitialIntent)
+        startActivity(alarmIntent)
+    }
+
+    private fun resolveDisplayName(pkg: String): String = try {
+        val appInfo = packageManager.getApplicationInfo(pkg, 0)
+        packageManager.getApplicationLabel(appInfo).toString()
+    } catch (e: PackageManager.NameNotFoundException) {
+        pkg
     }
 
     private fun getForegroundApp(): String? {

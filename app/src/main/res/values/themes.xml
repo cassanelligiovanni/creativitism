@@ -33,6 +33,18 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
+    <!-- Fire alarm: fully opaque so the blocked app can never peek through. The
+         background color itself is driven by AlarmActivity's pulse animator. -->
+    <style name="Theme.Creativitism.Alarm" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowBackground">@color/cv_alarm_bg</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:statusBarColor">@color/cv_alarm_bg</item>
+        <item name="android:navigationBarColor">@color/cv_alarm_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+    </style>
+
     <!-- Theme for the transparent proxy activity -->
     <style name="Theme.Transparent" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>

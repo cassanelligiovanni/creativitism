@@ -29,6 +29,9 @@
     <!-- Permission to wake up the device for service checks -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!-- Permission to vibrate as part of the fire-alarm intervention -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:name=".CreativitismApp"
         android:allowBackup="true"
@@ -52,14 +55,16 @@
             </intent-filter>
         </activity>
 
-        <!-- Full-screen pause shown when a blocked app is opened -->
+        <!-- Full-screen fire alarm shown when a blocked app is opened -->
         <activity
-            android:name=".BlockedInterstitialActivity"
+            android:name=".AlarmActivity"
             android:exported="false"
             android:launchMode="singleTask"
-            android:taskAffinity="com.creativitism.appredirector.interstitial"
+            android:taskAffinity="com.creativitism.appredirector.alarm"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.Creativitism.Interstitial" />
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.Creativitism.Alarm" />
 
         <!-- Invisible activity to proxy the redirection -->
         <activity

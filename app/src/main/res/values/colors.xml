@@ -17,6 +17,10 @@
     <color name="cv_error">#FF6363</color>
     <color name="cv_on_error">#FFFFFF</color>
 
+    <!-- Fire-alarm activity: opaque, pulses between these two -->
+    <color name="cv_alarm_bg">#0A0000</color>
+    <color name="cv_alarm_red">#C11F1F</color>
+
     <!-- Legacy aliases (interstitial / launcher — Task 20 removes) -->
     <color name="cv_ink">@color/cv_text</color>
     <color name="cv_muted">@color/cv_text_secondary</color>
