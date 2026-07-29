@@ -15,8 +15,17 @@ object AllowancePolicy {
     /** Sentinel for "no allowance stored". */
     const val NO_ALLOWANCE: Long = 0L
 
+    /** Sentinel stored as expiry for visit-scoped grants. */
+    const val VISIT_SCOPED: Long = -1L
+
     fun newExpiry(now: Long): Long = now + ALLOWANCE_MILLIS
+
+    fun isVisitScoped(expiryMillis: Long): Boolean = expiryMillis == VISIT_SCOPED
 
     fun isAllowed(expiryMillis: Long, now: Long): Boolean =
         expiryMillis != NO_ALLOWANCE && now < expiryMillis
+
+    fun isAllowed(expiryMillis: Long, now: Long, visitStillOpen: Boolean): Boolean =
+        if (isVisitScoped(expiryMillis)) visitStillOpen
+        else isAllowed(expiryMillis, now)
 }

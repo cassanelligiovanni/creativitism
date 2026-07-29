@@ -12,19 +12,48 @@ class TemporaryAllowanceManager(context: Context) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("temporary_allowances", Context.MODE_PRIVATE)
 
-    fun grant(packageName: String, now: Long = System.currentTimeMillis()) {
+    fun grant(packageName: String, now: Long = System.currentTimeMillis()) =
+        grantStrict(packageName, now)
+
+    fun grantStrict(packageName: String, now: Long = System.currentTimeMillis()) {
         prefs.edit().putLong(packageName, AllowancePolicy.newExpiry(now)).apply()
     }
 
-    fun isAllowed(packageName: String, now: Long = System.currentTimeMillis()): Boolean {
+    fun grantVisit(packageName: String) {
+        prefs.edit().putLong(packageName, AllowancePolicy.VISIT_SCOPED).apply()
+    }
+
+    fun isAllowed(
+        packageName: String,
+        now: Long = System.currentTimeMillis(),
+        visitStillOpen: Boolean,
+    ): Boolean {
         val expiry = prefs.getLong(packageName, AllowancePolicy.NO_ALLOWANCE)
+        if (AllowancePolicy.isVisitScoped(expiry)) {
+            if (!visitStillOpen) {
+                prefs.edit().remove(packageName).apply()
+                return false
+            }
+            return true
+        }
         if (expiry != AllowancePolicy.NO_ALLOWANCE && !AllowancePolicy.isAllowed(expiry, now)) {
             prefs.edit().remove(packageName).apply()
         }
         return AllowancePolicy.isAllowed(expiry, now)
     }
 
-    fun revoke(packageName: String) {
+    fun isAllowed(packageName: String, now: Long = System.currentTimeMillis()): Boolean {
+        val expiry = prefs.getLong(packageName, AllowancePolicy.NO_ALLOWANCE)
+        if (AllowancePolicy.isVisitScoped(expiry)) {
+            return false
+        }
+        if (expiry != AllowancePolicy.NO_ALLOWANCE && !AllowancePolicy.isAllowed(expiry, now)) {
+            prefs.edit().remove(packageName).apply()
+        }
+        return AllowancePolicy.isAllowed(expiry, now)
+    }
+
+    fun clear(packageName: String) {
         prefs.edit().remove(packageName).apply()
     }
 }

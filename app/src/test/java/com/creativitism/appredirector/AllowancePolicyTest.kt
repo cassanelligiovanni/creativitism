@@ -47,4 +47,48 @@ class AllowancePolicyTest {
     fun `wait period is ten seconds`() {
         assertEquals(10_000L, AllowancePolicy.WAIT_MILLIS)
     }
+
+    @Test
+    fun `visit scoped sentinel is negative one`() {
+        assertEquals(-1L, AllowancePolicy.VISIT_SCOPED)
+    }
+
+    @Test
+    fun `isVisitScoped recognizes sentinel`() {
+        assertTrue(AllowancePolicy.isVisitScoped(AllowancePolicy.VISIT_SCOPED))
+        assertFalse(AllowancePolicy.isVisitScoped(AllowancePolicy.NO_ALLOWANCE))
+        assertFalse(AllowancePolicy.isVisitScoped(AllowancePolicy.newExpiry(now)))
+    }
+
+    @Test
+    fun `visit scoped is allowed while visit still open`() {
+        assertTrue(
+            AllowancePolicy.isAllowed(AllowancePolicy.VISIT_SCOPED, now, visitStillOpen = true),
+        )
+    }
+
+    @Test
+    fun `visit scoped is denied when visit closed`() {
+        assertFalse(
+            AllowancePolicy.isAllowed(AllowancePolicy.VISIT_SCOPED, now, visitStillOpen = false),
+        )
+    }
+
+    @Test
+    fun `visit scoped allowed with arbitrary now when visit open`() {
+        assertTrue(
+            AllowancePolicy.isAllowed(
+                AllowancePolicy.VISIT_SCOPED,
+                Long.MAX_VALUE,
+                visitStillOpen = true,
+            ),
+        )
+    }
+
+    @Test
+    fun `timed isAllowed ignores visitStillOpen parameter for non sentinel`() {
+        val expiry = AllowancePolicy.newExpiry(now)
+        assertTrue(AllowancePolicy.isAllowed(expiry, now, visitStillOpen = false))
+        assertFalse(AllowancePolicy.isAllowed(expiry, expiry, visitStillOpen = true))
+    }
 }
