@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_to_creative"
         app:icon="@drawable/ic_tilde"
-        app:iconTint="@color/cv_teal" />
+        app:iconTint="@color/cv_creative" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/addToSoulSuckingButton"
@@ -42,6 +42,6 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_to_blocked"
         app:icon="@drawable/ic_block"
-        app:iconTint="@color/cv_sienna" />
+        app:iconTint="@color/cv_blocked" />
 
 </LinearLayout>

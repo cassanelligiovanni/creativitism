@@ -1,45 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Creativitism "glass over paper" tokens (light). Dark overrides in values-night. -->
+    <!-- Raycast dark tokens (Creativitism Milestone 1) -->
 
-    <!-- Paper ground -->
-    <color name="cv_paper_top">#F4F0E7</color>
-    <color name="cv_paper_mid">#EBE5D6</color>
-    <color name="cv_paper_bottom">#E0D8C4</color>
-    <color name="cv_surface">#F1ECDF</color>
-
-    <!-- Ink & text -->
-    <color name="cv_ink">#26241D</color>
-    <color name="cv_muted">#7D7666</color>
-
-    <!-- Accents -->
-    <color name="cv_teal">#0B8A7D</color>
-    <color name="cv_on_teal">#FFFFFF</color>
-    <color name="cv_sienna">#B4552D</color>
-
-    <!-- Glass panes -->
-    <color name="cv_glass_hi">#9EFFFFFF</color>
-    <color name="cv_glass_lo">#47FFFFFF</color>
-    <color name="cv_glass_stroke">#E6FFFFFF</color>
-    <color name="cv_divider">#66FFFFFF</color>
-
-    <!-- Color washes behind the glass -->
-    <color name="cv_wash_teal">#8C78D6C9</color>
-    <color name="cv_wash_apricot">#80F4BE8A</color>
-
-    <!-- Buttons -->
-    <color name="cv_button_bg">#26241D</color>
-    <color name="cv_button_text">#F4F0E7</color>
-
-    <!-- Interstitial frost sheet & countdown ring (matches mock_dir_b_inter.html) -->
-    <color name="cv_frost_top">#D1F4F0E7</color>
-    <color name="cv_frost_mid">#E5EEE8DB</color>
-    <color name="cv_frost_bottom">#F5E9E2D2</color>
-    <color name="cv_disc_top">#F2EEE4</color>
-    <color name="cv_disc_bottom">#EAE3D2</color>
-    <color name="cv_ring_track">#2426241D</color>
+    <color name="cv_bg">#07080a</color>
+    <color name="cv_surface">#101111</color>
+    <color name="cv_card">#1b1c1e</color>
+    <color name="cv_text">#f9f9f9</color>
+    <color name="cv_text_secondary">#9c9c9d</color>
+    <color name="cv_text_dim">#6a6b6c</color>
+    <color name="cv_blocked">#FF6363</color>
+    <color name="cv_creative">#5fc992</color>
+    <color name="cv_escape">#55b3ff</color>
+    <color name="cv_border">#252829</color>
 
     <!-- Semantic error (dialogs, destructive) -->
-    <color name="cv_error">#B3261E</color>
+    <color name="cv_error">#FF6363</color>
     <color name="cv_on_error">#FFFFFF</color>
+
+    <!-- Legacy aliases (interstitial / launcher — Task 20 removes) -->
+    <color name="cv_ink">@color/cv_text</color>
+    <color name="cv_muted">@color/cv_text_secondary</color>
+    <color name="cv_teal">@color/cv_escape</color>
+    <color name="cv_on_teal">@color/cv_text</color>
+    <color name="cv_sienna">@color/cv_blocked</color>
+    <color name="cv_paper_top">@color/cv_bg</color>
+    <color name="cv_paper_mid">@color/cv_surface</color>
+    <color name="cv_paper_bottom">@color/cv_bg</color>
+    <color name="cv_glass_hi">@color/cv_card</color>
+    <color name="cv_glass_lo">@color/cv_surface</color>
+    <color name="cv_glass_stroke">@color/cv_border</color>
+    <color name="cv_divider">@color/cv_border</color>
+    <color name="cv_wash_teal">#00000000</color>
+    <color name="cv_wash_apricot">#00000000</color>
+    <color name="cv_button_bg">@color/cv_text</color>
+    <color name="cv_button_text">@color/cv_bg</color>
+    <color name="cv_frost_top">@color/cv_card</color>
+    <color name="cv_frost_mid">@color/cv_surface</color>
+    <color name="cv_frost_bottom">@color/cv_bg</color>
+    <color name="cv_disc_top">@color/cv_card</color>
+    <color name="cv_disc_bottom">@color/cv_surface</color>
+    <color name="cv_ring_track">#40252829</color>
 </resources>

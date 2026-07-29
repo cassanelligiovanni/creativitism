@@ -33,6 +33,6 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/remove_item"
         app:icon="@drawable/ic_remove"
-        app:iconTint="@color/cv_muted" />
+        app:iconTint="@color/cv_text_secondary" />
 
 </LinearLayout>

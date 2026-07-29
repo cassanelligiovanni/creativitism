@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_paper"
+    android:background="@color/cv_bg"
     android:fillViewport="true"
     tools:context=".MainActivity">
 
@@ -26,20 +26,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/plex_serif"
+                android:fontFamily="@font/inter"
                 android:includeFontPadding="false"
                 android:text="@string/app_name"
-                android:textColor="@color/cv_ink"
+                android:textColor="@color/cv_text"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/plex_serif"
+                android:fontFamily="@font/inter"
                 android:includeFontPadding="false"
                 android:text="@string/tilde"
-                android:textColor="@color/cv_teal"
+                android:textColor="@color/cv_creative"
                 android:textSize="30sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -48,11 +48,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:fontFamily="@font/plex_serif"
+            android:fontFamily="@font/inter"
             android:text="@string/app_tagline"
-            android:textColor="@color/cv_muted"
-            android:textSize="14sp"
-            android:textStyle="italic" />
+            android:textColor="@color/cv_text_secondary"
+            android:textSize="14sp" />
 
         <!-- Protection pane -->
         <LinearLayout
@@ -61,7 +60,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
             android:background="@drawable/bg_glass"
-            android:elevation="4dp"
             android:orientation="vertical"
             android:padding="18dp">
 
@@ -80,9 +78,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/plex_serif"
+                        android:fontFamily="@font/inter"
                         android:text="@string/protection_title"
-                        android:textColor="@color/cv_ink"
+                        android:textColor="@color/cv_text"
                         android:textSize="17sp"
                         android:textStyle="bold" />
 
@@ -91,10 +89,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
-                        android:fontFamily="@font/plex_serif"
-                        android:textColor="@color/cv_muted"
+                        android:fontFamily="@font/inter"
+                        android:textColor="@color/cv_text_secondary"
                         android:textSize="13sp"
-                        android:textStyle="italic"
                         tools:text="blocked apps pause you first" />
                 </LinearLayout>
 
@@ -111,9 +108,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="@string/enable_website_blocking"
-                android:textColor="@color/cv_teal"
+                android:textColor="@color/cv_escape"
                 app:cornerRadius="24dp"
-                app:strokeColor="@color/cv_teal" />
+                app:strokeColor="@color/cv_escape" />
         </LinearLayout>
 
         <!-- Blocked pane -->
@@ -122,7 +119,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_glass"
-            android:elevation="4dp"
             android:orientation="vertical"
             android:padding="18dp">
 
@@ -137,15 +133,15 @@
                     android:layout_height="18dp"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_block"
-                    app:tint="@color/cv_sienna" />
+                    app:tint="@color/cv_blocked" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="9dp"
-                    android:fontFamily="@font/plex_serif"
+                    android:fontFamily="@font/inter"
                     android:text="@string/soul_sucking_title"
-                    android:textColor="@color/cv_ink"
+                    android:textColor="@color/cv_text"
                     android:textSize="17sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -154,20 +150,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
-                android:fontFamily="@font/plex_serif"
+                android:fontFamily="@font/inter"
                 android:text="@string/soul_sucking_subtitle"
-                android:textColor="@color/cv_muted"
-                android:textSize="13sp"
-                android:textStyle="italic" />
+                android:textColor="@color/cv_text_secondary"
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/emptyBlockedText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:fontFamily="@font/plex_serif"
+                android:fontFamily="@font/inter"
                 android:text="@string/empty_blocked"
-                android:textColor="@color/cv_muted"
+                android:textColor="@color/cv_text_dim"
                 android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
@@ -187,9 +182,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/add_website"
-                android:textColor="@color/cv_sienna"
+                android:textColor="@color/cv_blocked"
                 app:icon="@drawable/ic_globe"
-                app:iconTint="@color/cv_sienna" />
+                app:iconTint="@color/cv_blocked" />
         </LinearLayout>
 
         <!-- Creative pane -->
@@ -198,7 +193,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_glass"
-            android:elevation="4dp"
             android:orientation="vertical"
             android:padding="18dp">
 
@@ -213,15 +207,15 @@
                     android:layout_height="20dp"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_tilde"
-                    app:tint="@color/cv_teal" />
+                    app:tint="@color/cv_creative" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:fontFamily="@font/plex_serif"
+                    android:fontFamily="@font/inter"
                     android:text="@string/creativity_boosting_title"
-                    android:textColor="@color/cv_ink"
+                    android:textColor="@color/cv_text"
                     android:textSize="17sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -230,20 +224,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
-                android:fontFamily="@font/plex_serif"
+                android:fontFamily="@font/inter"
                 android:text="@string/creativity_boosting_subtitle"
-                android:textColor="@color/cv_muted"
-                android:textSize="13sp"
-                android:textStyle="italic" />
+                android:textColor="@color/cv_text_secondary"
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/emptyCreativeText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:fontFamily="@font/plex_serif"
+                android:fontFamily="@font/inter"
                 android:text="@string/empty_creative"
-                android:textColor="@color/cv_muted"
+                android:textColor="@color/cv_text_dim"
                 android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
@@ -263,9 +256,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/add_creative_website"
-                android:textColor="@color/cv_teal"
+                android:textColor="@color/cv_creative"
                 app:icon="@drawable/ic_globe"
-                app:iconTint="@color/cv_teal" />
+                app:iconTint="@color/cv_creative" />
         </LinearLayout>
 
         <!-- All apps pane -->
@@ -274,16 +267,15 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_glass"
-            android:elevation="4dp"
             android:orientation="vertical"
             android:padding="18dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/plex_serif"
+                android:fontFamily="@font/inter"
                 android:text="@string/all_apps_title"
-                android:textColor="@color/cv_ink"
+                android:textColor="@color/cv_text"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
@@ -291,11 +283,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
-                android:fontFamily="@font/plex_serif"
+                android:fontFamily="@font/inter"
                 android:text="@string/all_apps_subtitle"
-                android:textColor="@color/cv_muted"
-                android:textSize="13sp"
-                android:textStyle="italic" />
+                android:textColor="@color/cv_text_secondary"
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -311,21 +302,22 @@
                     android:layout_height="18dp"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_search"
-                    app:tint="@color/cv_muted" />
+                    app:tint="@color/cv_text_dim" />
 
                 <EditText
                     android:id="@+id/searchInput"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:background="@null"
+                    android:fontFamily="@font/inter"
                     android:hint="@string/search_apps_hint"
                     android:imeOptions="actionSearch"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:maxLines="1"
                     android:paddingStart="10dp"
-                    android:textColor="@color/cv_ink"
-                    android:textColorHint="@color/cv_muted"
+                    android:textColor="@color/cv_text"
+                    android:textColorHint="@color/cv_text_dim"
                     android:textSize="14sp" />
             </LinearLayout>
 
