@@ -9,7 +9,8 @@ class FakeSharedPreferences : SharedPreferences {
 
     override fun getAll(): Map<String, *> = data.toMap()
 
-    override fun getString(key: String, defValue: String?): String? = unsupported()
+    override fun getString(key: String, defValue: String?): String? =
+        data[key] as? String ?: defValue
 
     override fun getStringSet(key: String, defValues: MutableSet<String>?): MutableSet<String>? =
         unsupported()
@@ -64,7 +65,10 @@ class FakeSharedPreferences : SharedPreferences {
             return true
         }
 
-        override fun putString(key: String, value: String?): SharedPreferences.Editor = unsupported()
+        override fun putString(key: String, value: String?): SharedPreferences.Editor {
+            pending[key] = value
+            return this
+        }
 
         override fun putStringSet(
             key: String,
