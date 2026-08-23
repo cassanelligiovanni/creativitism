@@ -25,6 +25,7 @@ class RedirectorService : Service() {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
     private val mainHandler = Handler(Looper.getMainLooper())
+    private var monitoringJob: Job? = null
 
     private lateinit var redirectionManager: RedirectionManager
     private lateinit var appListManager: AppListManager
@@ -87,8 +88,11 @@ class RedirectorService : Service() {
         return START_STICKY
     }
 
+    // Idempotent: onStartCommand fires again for every startForegroundService call
+    // (boot receiver, keep-alive, unlock, self-heal) and must not stack extra loops.
     private fun startMonitoring() {
-        scope.launch {
+        if (monitoringJob?.isActive == true) return
+        monitoringJob = scope.launch {
             delay(1000) // Add a 1-second delay to mitigate race conditions on service start
             while (isActive) {
                 try {

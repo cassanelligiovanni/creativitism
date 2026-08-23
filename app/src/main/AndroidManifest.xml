@@ -95,7 +95,7 @@
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Digital-wellbeing app blocking: monitors the foreground app so the user's self-selected distracting apps can be intercepted and redirected to creative alternatives." />
+                android:value="Digital-wellbeing monitoring: watches the foreground app so the user's self-selected distracting apps can be intercepted and redirected to creative alternatives, and so apps the user excluded from system-wide grayscale regain color while in the foreground." />
         </service>
 
         <!-- Accessibility service for URL interception -->

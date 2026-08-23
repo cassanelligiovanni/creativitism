@@ -122,6 +122,25 @@ for stats (about 90 days); unblocked foreground checks are not retained.
 
 ---
 
+## (c2) `WRITE_SECURE_SETTINGS` (grayscale mode) — no Play form
+
+There is no Play Console declaration form for `WRITE_SECURE_SETTINGS`: Play cannot
+grant it and the manifest entry alone does not give the app the permission. It only
+becomes active if the user runs a one-time `adb shell pm grant` themselves (the app
+explains this in the Grayscale setup dialog). If a reviewer asks, the accurate
+statement is:
+
+```
+Creativitism declares WRITE_SECURE_SETTINGS solely for its opt-in grayscale
+mode, which toggles Android's own color-correction (daltonizer) accessibility
+setting so the device stays in black & white except for apps the user allows
+in color. The permission cannot be granted by Play or at runtime; the user
+must grant it once over adb, and the feature degrades gracefully (with an
+explanation) when it is absent. No data is read, collected, or transmitted.
+```
+
+---
+
 ## (d) Foreground service (`specialUse`) justification
 
 Play Console path: this is declared directly in the manifest via the `PROPERTY_SPECIAL_USE_FGS_SUBTYPE` metadata on `RedirectorService`, and may also surface in Play Console's pre-launch report or a policy questionnaire if Play requests confirmation of `FOREGROUND_SERVICE_SPECIAL_USE` usage.
@@ -129,9 +148,10 @@ Play Console path: this is declared directly in the manifest via the `PROPERTY_S
 **Text already in the manifest** (`AndroidManifest.xml`, on the `RedirectorService` special-use property) — reuse this exact wording if a console form asks you to restate it:
 
 ```
-Digital-wellbeing app blocking: monitors the foreground app so the user's
+Digital-wellbeing monitoring: watches the foreground app so the user's
 self-selected distracting apps can be intercepted and redirected to creative
-alternatives.
+alternatives, and so apps the user excluded from system-wide grayscale regain
+color while in the foreground.
 ```
 
 If Play Console's Foreground Service (Special Use) declaration form asks for a longer justification, use:

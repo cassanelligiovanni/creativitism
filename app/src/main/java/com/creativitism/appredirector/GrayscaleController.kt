@@ -57,6 +57,14 @@ class GrayscaleController(
             }
             return false
         }
+        // Re-check the master toggle right before writing: the UI may have just
+        // disabled the mode and restored the user's settings while a service tick
+        // decided "grayscale" from a moment-earlier read. Same-process prefs make
+        // this read see the newest value, collapsing the race to a no-op.
+        if (wantGrayscale && !store.enabled) {
+            lastApplied = null
+            return false
+        }
         return try {
             if (wantGrayscale) {
                 if (!isDeviceGrayscale()) {
@@ -118,9 +126,13 @@ class GrayscaleController(
         )
         val resolver = appContext.contentResolver
         if (snapEnabled == 1) {
-            Settings.Secure.putInt(resolver, KEY_DALTONIZER, snapMode)
-            Settings.Secure.putInt(resolver, KEY_DALTONIZER_ENABLED, 1)
-        } else {
+            if (readSetting(KEY_DALTONIZER, GrayscalePolicy.DALTONIZER_DISABLED) != snapMode) {
+                Settings.Secure.putInt(resolver, KEY_DALTONIZER, snapMode)
+            }
+            if (readSetting(KEY_DALTONIZER_ENABLED, 0) != 1) {
+                Settings.Secure.putInt(resolver, KEY_DALTONIZER_ENABLED, 1)
+            }
+        } else if (readSetting(KEY_DALTONIZER_ENABLED, 0) != 0) {
             Settings.Secure.putInt(resolver, KEY_DALTONIZER_ENABLED, 0)
         }
     }
