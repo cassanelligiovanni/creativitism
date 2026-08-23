@@ -12,17 +12,20 @@ class FakeSharedPreferences : SharedPreferences {
     override fun getString(key: String, defValue: String?): String? =
         data[key] as? String ?: defValue
 
+    @Suppress("UNCHECKED_CAST")
     override fun getStringSet(key: String, defValues: MutableSet<String>?): MutableSet<String>? =
-        unsupported()
+        (data[key] as? Set<String>)?.toMutableSet() ?: defValues
 
-    override fun getInt(key: String, defValue: Int): Int = unsupported()
+    override fun getInt(key: String, defValue: Int): Int =
+        data[key] as? Int ?: defValue
 
     override fun getLong(key: String, defValue: Long): Long =
         data[key] as? Long ?: defValue
 
     override fun getFloat(key: String, defValue: Float): Float = unsupported()
 
-    override fun getBoolean(key: String, defValue: Boolean): Boolean = unsupported()
+    override fun getBoolean(key: String, defValue: Boolean): Boolean =
+        data[key] as? Boolean ?: defValue
 
     override fun contains(key: String): Boolean = key in data
 
@@ -73,13 +76,22 @@ class FakeSharedPreferences : SharedPreferences {
         override fun putStringSet(
             key: String,
             values: MutableSet<String>?,
-        ): SharedPreferences.Editor = unsupported()
+        ): SharedPreferences.Editor {
+            pending[key] = values?.toSet()
+            return this
+        }
 
-        override fun putInt(key: String, value: Int): SharedPreferences.Editor = unsupported()
+        override fun putInt(key: String, value: Int): SharedPreferences.Editor {
+            pending[key] = value
+            return this
+        }
 
         override fun putFloat(key: String, value: Float): SharedPreferences.Editor = unsupported()
 
-        override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor = unsupported()
+        override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor {
+            pending[key] = value
+            return this
+        }
 
         override fun clear(): SharedPreferences.Editor = unsupported()
     }

@@ -40,8 +40,7 @@ class ServiceRestartReceiver : BroadcastReceiver() {
     }
 
     private fun shouldServiceBeRunning(context: Context): Boolean {
-        // Check if user has granted all necessary permissions
-        val sharedPrefs = context.getSharedPreferences("app_state", Context.MODE_PRIVATE)
-        return sharedPrefs.getBoolean("service_enabled", false)
+        // Blocking or grayscale mode both need the monitoring service alive
+        return RedirectorService.shouldBeRunning(context)
     }
 }

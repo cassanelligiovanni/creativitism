@@ -82,8 +82,7 @@ object ServiceKeepAliveManager {
             if (intent.action == ACTION_CHECK_SERVICE) {
                 Log.d("ServiceCheckReceiver", "Checking service status...")
 
-                val sharedPrefs = context.getSharedPreferences("app_state", Context.MODE_PRIVATE)
-                val shouldBeRunning = sharedPrefs.getBoolean("service_enabled", false)
+                val shouldBeRunning = RedirectorService.shouldBeRunning(context)
 
                 if (shouldBeRunning && !isServiceRunning(context)) {
                     Log.d("ServiceCheckReceiver", "Service is not running but should be. Restarting...")

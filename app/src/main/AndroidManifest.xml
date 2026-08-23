@@ -35,6 +35,12 @@
     <!-- Optional mic for spoken confession; typed fallback always available -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- System-wide grayscale via the color-correction (daltonizer) secure settings.
+         Grantable only through a one-time `adb shell pm grant`; the app detects the
+         grant state and walks the user through it. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
     <application
         android:name=".CreativitismApp"
         android:allowBackup="true"
@@ -76,6 +82,12 @@
             android:excludeFromRecents="true"
             android:exported="false" />
 
+        <!-- Picker for apps allowed to keep their color in grayscale mode -->
+        <activity
+            android:name=".ColorAppsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Creativitism" />
+
         <!-- Background service for monitoring app launches -->
         <service
             android:name=".RedirectorService"
@@ -83,7 +95,7 @@
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Digital-wellbeing app blocking: monitors the foreground app so the user's self-selected distracting apps can be intercepted and redirected to creative alternatives." />
+                android:value="Digital-wellbeing monitoring: watches the foreground app so the user's self-selected distracting apps can be intercepted and redirected to creative alternatives, and so apps the user excluded from system-wide grayscale regain color while in the foreground." />
         </service>
 
         <!-- Accessibility service for URL interception -->

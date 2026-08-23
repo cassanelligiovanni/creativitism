@@ -46,6 +46,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settingsStore: AppSettingsStore
     private lateinit var scheduleStore: ScheduleStore
     private lateinit var interventionLog: InterventionLog
+    private lateinit var grayscaleStore: GrayscaleStore
+    private lateinit var grayscaleController: GrayscaleController
 
     private var allApps: List<AppInfo> = emptyList()
     private var allAppsLoaded = false
@@ -110,6 +112,8 @@ class MainActivity : AppCompatActivity() {
         settingsStore = AppSettingsStore(this)
         scheduleStore = ScheduleStore(this)
         interventionLog = InterventionLog(this)
+        grayscaleStore = GrayscaleStore(this)
+        grayscaleController = GrayscaleController(this, grayscaleStore)
         activeHours = scheduleStore.load()
 
         setupUI()
@@ -128,6 +132,15 @@ class MainActivity : AppCompatActivity() {
         refreshStatsAndReceipt()
         scheduleStatusHandler.removeCallbacks(scheduleStatusRunnable)
         scheduleStatusHandler.post(scheduleStatusRunnable)
+
+        // Self-heal: if blocking or grayscale needs the monitor but the service died
+        // (crash, force-stop, missed boot start), bring it back while we are visibly
+        // in the foreground and allowed to start it.
+        if (RedirectorService.shouldBeRunning(this) &&
+            !ServiceKeepAliveManager.isServiceRunning(this)
+        ) {
+            startForegroundService(Intent(this, RedirectorService::class.java))
+        }
     }
 
     private fun setupUI() {
@@ -186,6 +199,32 @@ class MainActivity : AppCompatActivity() {
         binding.accessibilityPermissionButton.setOnClickListener {
             showAccessibilityDisclosure()
         }
+        binding.grayscaleSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (updatingSwitchFromCode) return@setOnCheckedChangeListener
+            if (isChecked) {
+                when {
+                    !grayscaleController.hasPermission() -> {
+                        showGrayscaleSetupDialog()
+                        updatingSwitchFromCode = true
+                        binding.grayscaleSwitch.isChecked = false
+                        updatingSwitchFromCode = false
+                    }
+                    !hasUsageStatsPermission() -> {
+                        requestUsageStatsPermission()
+                        updatingSwitchFromCode = true
+                        binding.grayscaleSwitch.isChecked = false
+                        updatingSwitchFromCode = false
+                    }
+                    else -> enableGrayscale()
+                }
+            } else {
+                disableGrayscale()
+            }
+        }
+        binding.colorAppsRow.setOnClickListener {
+            startActivity(Intent(this, ColorAppsActivity::class.java))
+        }
+        binding.grayscaleSetupButton.setOnClickListener { showGrayscaleSetupDialog() }
         binding.resumeLastWorkSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (updatingSwitchFromCode) return@setOnCheckedChangeListener
             settingsStore.resumeLastWork = isChecked
@@ -519,6 +558,39 @@ class MainActivity : AppCompatActivity() {
             binding.accessibilityPermissionButton.text = getString(R.string.enable_website_blocking)
             binding.accessibilityPermissionButton.isEnabled = true
         }
+
+        updateGrayscaleUI()
+    }
+
+    private fun updateGrayscaleUI() {
+        val hasSecureSettings = grayscaleController.hasPermission()
+        val enabled = grayscaleStore.enabled
+        updatingSwitchFromCode = true
+        binding.grayscaleSwitch.isChecked = enabled
+        updatingSwitchFromCode = false
+        binding.grayscaleStatusText.text = getString(
+            when {
+                enabled && hasSecureSettings -> R.string.grayscale_on
+                enabled -> R.string.grayscale_needs_setup
+                else -> R.string.grayscale_off
+            }
+        )
+        binding.grayscaleSetupButton.visibility =
+            if (hasSecureSettings) android.view.View.GONE else android.view.View.VISIBLE
+        binding.colorAppsSubtitle.text = describeColorApps()
+    }
+
+    private fun describeColorApps(): String {
+        val colorApps = grayscaleStore.colorApps()
+        if (colorApps.isEmpty()) return getString(R.string.grayscale_color_apps_none)
+        val labels = colorApps
+            .map { pkg -> appListManager.getAppInfo(pkg)?.appName ?: pkg }
+            .sortedBy { it.lowercase() }
+        val shown = labels.take(3).joinToString(", ") +
+            if (labels.size > 3) " +${labels.size - 3}" else ""
+        return resources.getQuantityString(
+            R.plurals.grayscale_color_apps_count, colorApps.size, shown, colorApps.size,
+        )
     }
 
     private fun hasUsageStatsPermission(): Boolean {
@@ -590,13 +662,83 @@ class MainActivity : AppCompatActivity() {
     private fun stopRedirectorService() {
         appStatePrefs.edit().putBoolean("service_enabled", false).apply()
 
-        ServiceKeepAliveManager.cancelPeriodicCheck(this)
-
-        val intent = Intent(this, RedirectorService::class.java)
-        stopService(intent)
+        // Grayscale mode still needs the foreground monitor; only tear the
+        // service down when nothing depends on it anymore.
+        if (!grayscaleStore.enabled) {
+            ServiceKeepAliveManager.cancelPeriodicCheck(this)
+            stopService(Intent(this, RedirectorService::class.java))
+        }
 
         Toast.makeText(this, R.string.service_stopped, Toast.LENGTH_SHORT).show()
         updatePermissionUI()
+    }
+
+    // --- Grayscale mode ---
+
+    // Proceeds either way: the foreground service runs without the notification
+    // permission too, it is just less visible. Grayscale should not be blocked on it.
+    private val grayscaleNotificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
+            startMonitoringService()
+            updatePermissionUI()
+        }
+
+    private fun enableGrayscale() {
+        grayscaleStore.enabled = true
+        // Instant feedback while the service spins up: we are the foreground app,
+        // so apply whatever the policy says for ourselves.
+        grayscaleController.apply(
+            GrayscalePolicy.wantsGrayscale(
+                modeEnabled = true,
+                screenInteractive = true,
+                foregroundPackage = packageName,
+                colorApps = grayscaleStore.colorApps(),
+            ) ?: true,
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            grayscaleNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            startMonitoringService()
+        }
+        Toast.makeText(this, R.string.grayscale_started, Toast.LENGTH_SHORT).show()
+        updatePermissionUI()
+    }
+
+    private fun disableGrayscale() {
+        if (!grayscaleStore.enabled) return
+        grayscaleStore.enabled = false
+        grayscaleController.release()
+        if (!appStatePrefs.getBoolean("service_enabled", false)) {
+            ServiceKeepAliveManager.cancelPeriodicCheck(this)
+            stopService(Intent(this, RedirectorService::class.java))
+        }
+        Toast.makeText(this, R.string.grayscale_stopped, Toast.LENGTH_SHORT).show()
+        updatePermissionUI()
+    }
+
+    private fun startMonitoringService() {
+        requestBatteryOptimizationExemption()
+        startForegroundService(Intent(this, RedirectorService::class.java))
+        ServiceKeepAliveManager.schedulePeriodicCheck(this)
+    }
+
+    private fun showGrayscaleSetupDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.grayscale_setup_title)
+            .setMessage(R.string.grayscale_setup_message)
+            .setPositiveButton(R.string.grayscale_setup_copy) { _, _ ->
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                clipboard.setPrimaryClip(
+                    android.content.ClipData.newPlainText(
+                        getString(R.string.grayscale_setup_title),
+                        getString(R.string.grayscale_setup_command),
+                    )
+                )
+                Toast.makeText(this, R.string.grayscale_setup_copied, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {

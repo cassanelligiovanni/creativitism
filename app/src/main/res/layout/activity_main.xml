@@ -420,6 +420,126 @@
                             app:cornerRadius="24dp" />
                     </LinearLayout>
                 </com.creativitism.appredirector.GlassCardView>
+
+                <!-- Grayscale mode -->
+                <com.creativitism.appredirector.GlassCardView
+                    android:id="@+id/grayscaleCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter"
+                                    android:text="@string/grayscale_title"
+                                    android:textColor="@color/cv_text"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/grayscaleStatusText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="1dp"
+                                    android:fontFamily="@font/inter"
+                                    android:textColor="@color/cv_text_secondary"
+                                    android:textSize="13sp"
+                                    tools:text="everything in black &amp; white" />
+                            </LinearLayout>
+
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/grayscaleSwitch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:thumbTint="@color/switch_thumb"
+                                app:trackTint="@color/switch_track" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="14dp"
+                            android:background="@color/cv_border" />
+
+                        <LinearLayout
+                            android:id="@+id/colorAppsRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter"
+                                    android:text="@string/grayscale_color_apps_title"
+                                    android:textColor="@color/cv_text"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/colorAppsSubtitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="1dp"
+                                    android:fontFamily="@font/inter"
+                                    android:text="@string/grayscale_color_apps_none"
+                                    android:textColor="@color/cv_text_secondary"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter"
+                                android:importantForAccessibility="no"
+                                android:text="@string/grayscale_color_apps_chevron"
+                                android:textColor="@color/cv_text_secondary"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/grayscaleSetupButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:backgroundTint="@color/cv_escape"
+                            android:fontFamily="@font/inter"
+                            android:text="@string/grayscale_setup_button"
+                            android:textColor="#1A120A"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                            app:cornerRadius="24dp"
+                            tools:visibility="visible" />
+                    </LinearLayout>
+                </com.creativitism.appredirector.GlassCardView>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

@@ -14,6 +14,12 @@ open a blocked app, Creativitism covers it with a full-screen *"Take a breath"* 
 Website blocking works in Chrome through an accessibility service that reads the
 address bar and pauses pages matching your blocklist.
 
+**Grayscale mode** keeps the whole device in black & white, persistently — except the
+few apps you explicitly allow to stay in color (picked in *Guard → Apps in color*).
+It drives Android's own color-correction setting per foreground app, which requires a
+one-time `adb shell pm grant` of `WRITE_SECURE_SETTINGS`; the app walks you through
+it. Design notes: [docs/superpowers/plans/2026-08-23-grayscale-mode.md](docs/superpowers/plans/2026-08-23-grayscale-mode.md)
+
 Everything stays on your device. No accounts, no analytics, no network calls.
 
 ## Design
@@ -50,3 +56,4 @@ Everything needed for submission lives in [docs/playstore/](docs/playstore/):
 | Accessibility service | Read the Chrome address bar to block websites |
 | `QUERY_ALL_PACKAGES` | List your installed apps so you can build your lists |
 | Notifications + foreground service | Keep the monitoring service alive and visible |
+| `WRITE_SECURE_SETTINGS` (via one-time adb grant) | Toggle the system color-correction setting for grayscale mode |
