@@ -72,6 +72,13 @@ await_state gray
 echo "OK: grayscale active"
 
 log "Rebooting device"
+# A force-stopped package receives no broadcasts (including BOOT_COMPLETED), and
+# `am instrument` force-stops the app when it exits. The MainActivity launch above
+# cleared the stopped flag; verify that, and give PackageManager a moment to persist
+# it so the reboot doesn't race the write and resurrect the stopped state.
+stopped=$(adb shell dumpsys package "$PKG" | grep -o "stopped=[a-z]*" | head -1 | tr -d '\r')
+[[ $stopped == "stopped=false" ]] || fail "package is force-stopped; boot broadcasts would be dropped ($stopped)"
+sleep 5
 adb reboot
 await_boot
 adb shell svc power stayon true
