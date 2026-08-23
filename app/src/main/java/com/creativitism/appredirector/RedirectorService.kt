@@ -12,6 +12,7 @@ import android.content.pm.ServiceInfo
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -31,6 +32,9 @@ class RedirectorService : Service() {
     private lateinit var visitTracker: VisitTracker
     private lateinit var scheduleStore: ScheduleStore
     private lateinit var settingsStore: AppSettingsStore
+    private lateinit var grayscaleStore: GrayscaleStore
+    private lateinit var grayscaleController: GrayscaleController
+    private lateinit var powerManager: PowerManager
 
     // Last time (elapsedRealtime) the alarm was launched, per package.
     private val alarmLaunchedAt = mutableMapOf<String, Long>()
@@ -43,6 +47,16 @@ class RedirectorService : Service() {
         // Don't relaunch the alarm for the same package within this window,
         // so the 500ms poll doesn't stack activities while it animates in.
         private const val ALARM_DEBOUNCE_MILLIS = 3_000L
+
+        /**
+         * The monitoring service must run while either feature that depends on
+         * foreground-app detection is on: app blocking or grayscale mode.
+         */
+        fun shouldBeRunning(context: Context): Boolean {
+            val appState = context.getSharedPreferences("app_state", Context.MODE_PRIVATE)
+            return appState.getBoolean("service_enabled", false) ||
+                GrayscaleStore(context).enabled
+        }
     }
 
     override fun onCreate() {
@@ -53,6 +67,9 @@ class RedirectorService : Service() {
         visitTracker = VisitTracker(this)
         scheduleStore = ScheduleStore(this)
         settingsStore = AppSettingsStore(this)
+        grayscaleStore = GrayscaleStore(this)
+        grayscaleController = GrayscaleController(this, grayscaleStore)
+        powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -95,16 +112,26 @@ class RedirectorService : Service() {
         val schedule = scheduleStore.load()
         val armed = SchedulePolicy.isArmed(schedule, minuteOfDay, weekdayMonday0)
         val resumeLabel = SchedulePolicy.nextResumeLabel(schedule, minuteOfDay, weekdayMonday0)
-        updateNotification(armed, resumeLabel)
+        val blockingEnabled = getSharedPreferences("app_state", Context.MODE_PRIVATE)
+            .getBoolean("service_enabled", false)
+        updateNotification(blockingEnabled, armed, resumeLabel)
 
         if (AlarmActivity.isShowing) {
+            // Our full-screen alarm is on top, so we are the effective foreground.
+            enforceGrayscale(packageName)
             if (!armed) {
                 mainHandler.post { AlarmActivity.dismissIfShowingForDormant() }
             }
             return
         }
 
-        val foreground = getForegroundApp() ?: return
+        val foreground = getForegroundApp()
+        enforceGrayscale(foreground)
+        if (foreground == null) return
+
+        // Everything below is app blocking; the service may also be running for
+        // grayscale mode alone, with the Protection switch off.
+        if (!blockingEnabled) return
 
         if (redirectionManager.getCreativityBoostingItems().contains(foreground)) {
             settingsStore.lastCreativeItem = foreground
@@ -141,6 +168,21 @@ class RedirectorService : Service() {
         startActivity(alarmIntent)
     }
 
+    // Grayscale is persistent and schedule-independent: every tick drives the
+    // system color-correction setting toward what the policy wants for the
+    // current foreground app. The controller skips redundant writes.
+    private fun enforceGrayscale(foreground: String?) {
+        val want = GrayscalePolicy.wantsGrayscale(
+            modeEnabled = grayscaleStore.enabled,
+            screenInteractive = powerManager.isInteractive,
+            foregroundPackage = foreground,
+            colorApps = grayscaleStore.colorApps(),
+        )
+        if (want != null) {
+            grayscaleController.apply(want)
+        }
+    }
+
     private fun resolveDisplayName(pkg: String): String = try {
         val appInfo = packageManager.getApplicationInfo(pkg, 0)
         packageManager.getApplicationLabel(appInfo).toString()
@@ -169,11 +211,11 @@ class RedirectorService : Service() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun updateNotification(armed: Boolean, resumeLabel: String?) {
-        val text = if (armed) {
-            getString(R.string.notification_text)
-        } else {
-            getString(
+    private fun updateNotification(blockingEnabled: Boolean, armed: Boolean, resumeLabel: String?) {
+        val text = when {
+            !blockingEnabled -> getString(R.string.notification_text_grayscale_only)
+            armed -> getString(R.string.notification_text)
+            else -> getString(
                 R.string.notification_text_dormant,
                 resumeLabel ?: "--:--",
             )
@@ -200,8 +242,7 @@ class RedirectorService : Service() {
         Log.d("RedirectorService", "Service destroyed")
 
         // Schedule a restart if the service was stopped unexpectedly
-        val sharedPrefs = getSharedPreferences("app_state", Context.MODE_PRIVATE)
-        if (sharedPrefs.getBoolean("service_enabled", false)) {
+        if (shouldBeRunning(this)) {
             Log.d("RedirectorService", "Service should be running, scheduling restart")
             ServiceKeepAliveManager.schedulePeriodicCheck(this)
         }
@@ -212,8 +253,7 @@ class RedirectorService : Service() {
         Log.d("RedirectorService", "Task removed, but service will continue running")
 
         // Restart the service when the app is removed from recent apps
-        val sharedPrefs = getSharedPreferences("app_state", Context.MODE_PRIVATE)
-        if (sharedPrefs.getBoolean("service_enabled", false)) {
+        if (shouldBeRunning(this)) {
             val restartServiceIntent = Intent(applicationContext, RedirectorService::class.java)
             applicationContext.startForegroundService(restartServiceIntent)
         }

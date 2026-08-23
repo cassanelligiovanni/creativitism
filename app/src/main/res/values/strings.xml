@@ -84,12 +84,39 @@
     <string name="confession_mic_disclosure_continue">Continue</string>
     <string name="confession_mic_use_typed">I\'ll type instead</string>
 
+    <!-- Grayscale mode -->
+    <string name="grayscale_title">Grayscale</string>
+    <string name="grayscale_on">everything in black &amp; white</string>
+    <string name="grayscale_off">off — full color</string>
+    <string name="grayscale_needs_setup">on, but needs the one-time setup below</string>
+    <string name="grayscale_color_apps_title">Apps in color</string>
+    <string name="grayscale_color_apps_none">none yet — everything stays gray</string>
+    <string name="grayscale_color_apps_chevron" translatable="false">›</string>
+    <string name="grayscale_setup_button">Set up grayscale (one-time)</string>
+    <string name="grayscale_setup_title">One-time setup with a computer</string>
+    <string name="grayscale_setup_message">Turning the whole screen gray uses a system setting Android only unlocks over ADB — once, from a computer.\n\n1. Enable Developer options and USB debugging on this phone\n2. Plug into a computer with ADB installed\n3. Run:\n\nadb shell pm grant com.creativitism.appredirector android.permission.WRITE_SECURE_SETTINGS\n\nThe grant survives restarts and app updates. Creativitism uses it only to toggle Android\'s own color-correction setting.</string>
+    <string name="grayscale_setup_copy">Copy command</string>
+    <string name="grayscale_setup_copied">Command copied</string>
+    <string name="grayscale_setup_command" translatable="false">adb shell pm grant com.creativitism.appredirector android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="grayscale_started">Grayscale is on</string>
+    <string name="grayscale_stopped">Grayscale is off</string>
+    <plurals name="grayscale_color_apps_count">
+        <item quantity="one">%1$s · 1 app in color</item>
+        <item quantity="other">%1$s · %2$d apps in color</item>
+    </plurals>
+
+    <!-- Apps-in-color picker -->
+    <string name="color_apps_title">Apps in color</string>
+    <string name="color_apps_subtitle">These keep their color. Everything else stays gray.</string>
+    <string name="color_apps_toggle_description">Toggle color for this app</string>
+
     <!-- Foreground service notification -->
     <string name="notification_channel_name">Protection service</string>
     <string name="notification_channel_description">Keeps watch for blocked apps</string>
     <string name="notification_title">Creativitism is protecting you</string>
     <string name="notification_text">Blocked apps will pause before opening.</string>
     <string name="notification_text_dormant">dormant — protection resumes at %1$s</string>
+    <string name="notification_text_grayscale_only">Keeping the screen in black &amp; white.</string>
 
     <!-- Active hours -->
     <string name="active_hours_title">Active hours</string>
