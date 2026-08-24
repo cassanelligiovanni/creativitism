@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
@@ -40,6 +41,11 @@ class RedirectorService : Service() {
     // Last time (elapsedRealtime) the alarm was launched, per package.
     private val alarmLaunchedAt = mutableMapOf<String, Long>()
     private var lastNotificationText: String? = null
+
+    // Usage-event watermark for foreground detection: each tick reads only events
+    // newer than this, and the last ACTIVITY_RESUMED package seen wins.
+    private var lastEventTimestamp = 0L
+    private var lastKnownForeground: String? = null
 
     companion object {
         const val NOTIFICATION_ID = 1
@@ -194,13 +200,39 @@ class RedirectorService : Service() {
         pkg
     }
 
+    // Foreground detection via usage EVENTS, not the aggregate lastTimeUsed stats:
+    // some launchers (e.g. Nothing OS) do not bump the launcher's aggregate on a
+    // gesture-home exit, so the aggregate max keeps naming the app the user just
+    // left. ACTIVITY_RESUMED events fire on every transition, gestures included.
+    // (ACTIVITY_RESUMED shares its value with the pre-API-29 MOVE_TO_FOREGROUND,
+    // so this works across the whole supported range.)
     private fun getForegroundApp(): String? {
         val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-        val time = System.currentTimeMillis()
-        val usageStats = usageStatsManager.queryUsageStats(
-            UsageStatsManager.INTERVAL_DAILY, time - 1000 * 10, time
-        )
-        return usageStats.maxByOrNull { it.lastTimeUsed }?.packageName
+        val now = System.currentTimeMillis()
+        if (lastEventTimestamp == 0L) {
+            lastEventTimestamp = now - 60_000
+        }
+        // Query with a small overlap: events can be committed slightly late, and
+        // reprocessing an already-seen RESUMED event is harmless.
+        val events = usageStatsManager.queryEvents(lastEventTimestamp - 1_000, now)
+        val event = UsageEvents.Event()
+        while (events.hasNextEvent()) {
+            events.getNextEvent(event)
+            if (event.timeStamp > lastEventTimestamp) {
+                lastEventTimestamp = event.timeStamp
+            }
+            if (event.eventType == UsageEvents.Event.ACTIVITY_RESUMED) {
+                lastKnownForeground = event.packageName
+            }
+        }
+        if (lastKnownForeground == null) {
+            // No resume event in the lookback window (fresh service on an idle
+            // device): fall back to the aggregate API for an initial answer.
+            lastKnownForeground = usageStatsManager.queryUsageStats(
+                UsageStatsManager.INTERVAL_DAILY, now - 1000 * 10, now
+            ).maxByOrNull { it.lastTimeUsed }?.packageName
+        }
+        return lastKnownForeground
     }
 
     private fun createNotificationChannel() {
