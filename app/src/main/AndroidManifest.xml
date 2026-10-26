@@ -132,6 +132,12 @@
             android:enabled="true"
             android:exported="false" />
 
+        <!-- "Resume now" action on the service notification: ends timed pauses -->
+        <receiver
+            android:name=".PauseResumeReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
         <!-- Shares weekly receipt PNGs from cache/receipts/ via content URI -->
         <provider
             android:name="androidx.core.content.FileProvider"

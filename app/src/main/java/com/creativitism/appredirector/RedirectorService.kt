@@ -3,6 +3,7 @@ package com.creativitism.appredirector
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
@@ -19,7 +20,9 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import kotlinx.coroutines.*
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 class RedirectorService : Service() {
 
@@ -36,6 +39,7 @@ class RedirectorService : Service() {
     private lateinit var settingsStore: AppSettingsStore
     private lateinit var grayscaleStore: GrayscaleStore
     private lateinit var grayscaleController: GrayscaleController
+    private lateinit var pauseStore: PauseStore
     private lateinit var powerManager: PowerManager
 
     // Last time (elapsedRealtime) the alarm was launched, per package.
@@ -76,6 +80,7 @@ class RedirectorService : Service() {
         settingsStore = AppSettingsStore(this)
         grayscaleStore = GrayscaleStore(this)
         grayscaleController = GrayscaleController(this, grayscaleStore)
+        pauseStore = PauseStore(this)
         powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
     }
 
@@ -122,9 +127,13 @@ class RedirectorService : Service() {
         val schedule = scheduleStore.load()
         val armed = SchedulePolicy.isArmed(schedule, minuteOfDay, weekdayMonday0)
         val resumeLabel = SchedulePolicy.nextResumeLabel(schedule, minuteOfDay, weekdayMonday0)
-        val blockingEnabled = getSharedPreferences("app_state", Context.MODE_PRIVATE)
+        val protectionEnabled = getSharedPreferences("app_state", Context.MODE_PRIVATE)
             .getBoolean("service_enabled", false)
-        updateNotification(blockingEnabled, armed, resumeLabel)
+        // A paused Protection keeps service_enabled on, so blocking re-arms by
+        // itself on the first tick after the pause ends.
+        val protectionPaused = protectionEnabled && pauseStore.isProtectionPaused(wallNow)
+        val blockingEnabled = protectionEnabled && !protectionPaused
+        updateNotification(protectionEnabled, armed, resumeLabel, pauseLabel(wallNow))
 
         if (AlarmActivity.isShowing) {
             // Our full-screen alarm is on top, so we are the effective foreground.
@@ -182,6 +191,10 @@ class RedirectorService : Service() {
     // system color-correction setting toward what the policy wants for the
     // current foreground app. The controller skips redundant writes.
     private fun enforceGrayscale(foreground: String?) {
+        if (grayscaleStore.enabled && pauseStore.isGrayscalePaused(System.currentTimeMillis())) {
+            grayscaleController.apply(false)
+            return
+        }
         val want = GrayscalePolicy.wantsGrayscale(
             modeEnabled = grayscaleStore.enabled,
             screenInteractive = powerManager.isInteractive,
@@ -247,8 +260,40 @@ class RedirectorService : Service() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun updateNotification(blockingEnabled: Boolean, armed: Boolean, resumeLabel: String?) {
+    // Null when nothing is paused; otherwise e.g. "Protection paused until 14:05".
+    private fun pauseLabel(now: Long): String? {
+        val parts = mutableListOf<String>()
+        if (appStateEnabled() && pauseStore.isProtectionPaused(now)) {
+            parts += getString(
+                R.string.notification_protection_paused,
+                formatPauseEnd(pauseStore.protectionPausedUntil),
+            )
+        }
+        if (grayscaleStore.enabled && pauseStore.isGrayscalePaused(now)) {
+            parts += getString(
+                R.string.notification_grayscale_paused,
+                formatPauseEnd(pauseStore.grayscalePausedUntil),
+            )
+        }
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    }
+
+    private fun appStateEnabled(): Boolean =
+        getSharedPreferences("app_state", Context.MODE_PRIVATE)
+            .getBoolean("service_enabled", false)
+
+    private fun formatPauseEnd(epochMillis: Long): String = PausePolicy.formatEnd(
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneId.systemDefault()),
+    )
+
+    private fun updateNotification(
+        blockingEnabled: Boolean,
+        armed: Boolean,
+        resumeLabel: String?,
+        pauseLabel: String?,
+    ) {
         val text = when {
+            pauseLabel != null -> pauseLabel
             !blockingEnabled -> getString(R.string.notification_text_grayscale_only)
             armed -> getString(R.string.notification_text)
             else -> getString(
@@ -260,16 +305,28 @@ class RedirectorService : Service() {
         lastNotificationText = text
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, createNotification(text))
+        notificationManager.notify(
+            NOTIFICATION_ID,
+            createNotification(text, showResume = pauseLabel != null),
+        )
     }
 
-    private fun createNotification(contentText: String): Notification {
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+    private fun createNotification(contentText: String, showResume: Boolean = false): Notification {
+        val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(contentText)
             .setSmallIcon(R.drawable.ic_tilde)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
+        if (showResume) {
+            val resumeIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                Intent(this, PauseResumeReceiver::class.java),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+            builder.addAction(0, getString(R.string.notification_resume_now), resumeIntent)
+        }
+        return builder.build()
     }
 
     override fun onDestroy() {

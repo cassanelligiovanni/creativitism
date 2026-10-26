@@ -15,6 +15,7 @@ class UrlInterceptorService : AccessibilityService() {
     private lateinit var allowanceManager: TemporaryAllowanceManager
     private lateinit var visitTracker: VisitTracker
     private lateinit var scheduleStore: ScheduleStore
+    private lateinit var pauseStore: PauseStore
 
     private var lastUrl: String? = null
     private var lastMatchedDomain: String? = null
@@ -32,6 +33,7 @@ class UrlInterceptorService : AccessibilityService() {
         allowanceManager = TemporaryAllowanceManager(this)
         visitTracker = VisitTracker(this)
         scheduleStore = ScheduleStore(this)
+        pauseStore = PauseStore(this)
         val info = AccessibilityServiceInfo().apply {
             eventTypes = AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
             packageNames = arrayOf("com.android.chrome")
@@ -65,6 +67,8 @@ class UrlInterceptorService : AccessibilityService() {
 
     private fun maybeLaunchAlarm(domain: String, wallNow: Long) {
         if (AlarmActivity.isShowing) return
+        // A timed Protection pause covers websites too.
+        if (pauseStore.isProtectionPaused(wallNow)) return
 
         val localNow = LocalDateTime.now()
         val minuteOfDay = localNow.hour * 60 + localNow.minute

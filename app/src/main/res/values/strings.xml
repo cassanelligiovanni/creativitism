@@ -14,6 +14,14 @@
     <string name="protection_title">Protection</string>
     <string name="protection_on">blocked apps pause you first</string>
     <string name="protection_off">off — everything opens freely</string>
+    <string name="protection_paused">paused — back on at %1$s</string>
+    <string name="pause_protection_title">Pause protection?</string>
+    <string name="pause_grayscale_title">Pause black &amp; white?</string>
+    <string name="pause_15_minutes">15 minutes</string>
+    <string name="pause_1_hour">1 hour</string>
+    <string name="pause_until_morning">Until morning (08:00)</string>
+    <string name="pause_turn_off_completely">Turn off completely</string>
+    <string name="pause_started">Paused until %1$s</string>
     <string name="enable_website_blocking">Turn on website blocking</string>
     <string name="website_blocking_active">Website blocking is on</string>
 
@@ -88,6 +96,7 @@
     <string name="grayscale_title">Grayscale</string>
     <string name="grayscale_on">everything in black &amp; white</string>
     <string name="grayscale_off">off — full color</string>
+    <string name="grayscale_paused">paused — black &amp; white again at %1$s</string>
     <string name="grayscale_needs_setup">on, but needs the one-time setup below</string>
     <string name="grayscale_color_apps_title">Apps in color</string>
     <string name="grayscale_color_apps_none">none yet — everything stays gray</string>
@@ -117,6 +126,9 @@
     <string name="notification_text">Blocked apps will pause before opening.</string>
     <string name="notification_text_dormant">dormant — protection resumes at %1$s</string>
     <string name="notification_text_grayscale_only">Keeping the screen in black &amp; white.</string>
+    <string name="notification_protection_paused">Protection paused until %1$s</string>
+    <string name="notification_grayscale_paused">Black &amp; white paused until %1$s</string>
+    <string name="notification_resume_now">Resume now</string>
 
     <!-- Active hours -->
     <string name="active_hours_title">Active hours</string>

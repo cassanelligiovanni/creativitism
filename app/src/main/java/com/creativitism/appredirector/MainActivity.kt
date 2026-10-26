@@ -29,8 +29,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.creativitism.appredirector.databinding.ActivityMainBinding
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var interventionLog: InterventionLog
     private lateinit var grayscaleStore: GrayscaleStore
     private lateinit var grayscaleController: GrayscaleController
+    private lateinit var pauseStore: PauseStore
 
     private var allApps: List<AppInfo> = emptyList()
     private var allAppsLoaded = false
@@ -71,6 +74,8 @@ class MainActivity : AppCompatActivity() {
     private val scheduleStatusRunnable = object : Runnable {
         override fun run() {
             updateScheduleStatus()
+            // Also picks up a pause that ran out while the screen was open.
+            updatePermissionUI()
             scheduleStatusHandler.postDelayed(this, 30_000L)
         }
     }
@@ -114,6 +119,7 @@ class MainActivity : AppCompatActivity() {
         interventionLog = InterventionLog(this)
         grayscaleStore = GrayscaleStore(this)
         grayscaleController = GrayscaleController(this, grayscaleStore)
+        pauseStore = PauseStore(this)
         activeHours = scheduleStore.load()
 
         setupUI()
@@ -193,7 +199,7 @@ class MainActivity : AppCompatActivity() {
                     checkNotificationPermsAndStartService()
                 }
             } else {
-                stopRedirectorService()
+                showPauseDialog(PauseTarget.PROTECTION)
             }
         }
         binding.accessibilityPermissionButton.setOnClickListener {
@@ -218,7 +224,7 @@ class MainActivity : AppCompatActivity() {
                     else -> enableGrayscale()
                 }
             } else {
-                disableGrayscale()
+                showPauseDialog(PauseTarget.GRAYSCALE)
             }
         }
         binding.colorAppsRow.setOnClickListener {
@@ -543,13 +549,21 @@ class MainActivity : AppCompatActivity() {
                 (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
                         ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
         val serviceEnabled = hasAllAppPerms && appStatePrefs.getBoolean("service_enabled", false)
+        val protectionPaused = serviceEnabled &&
+            pauseStore.isProtectionPaused(System.currentTimeMillis())
         updatingSwitchFromCode = true
-        binding.serviceSwitch.isChecked = serviceEnabled
+        // Paused reads as off, so flipping the switch on resumes right away.
+        binding.serviceSwitch.isChecked = serviceEnabled && !protectionPaused
         binding.resumeLastWorkSwitch.isChecked = settingsStore.resumeLastWork
         updatingSwitchFromCode = false
-        binding.statusText.text = getString(
-            if (serviceEnabled) R.string.protection_on else R.string.protection_off
-        )
+        binding.statusText.text = when {
+            protectionPaused -> getString(
+                R.string.protection_paused,
+                formatPauseEnd(pauseStore.protectionPausedUntil),
+            )
+            serviceEnabled -> getString(R.string.protection_on)
+            else -> getString(R.string.protection_off)
+        }
 
         if (isAccessibilityServiceEnabled()) {
             binding.accessibilityPermissionButton.text = getString(R.string.website_blocking_active)
@@ -565,16 +579,19 @@ class MainActivity : AppCompatActivity() {
     private fun updateGrayscaleUI() {
         val hasSecureSettings = grayscaleController.hasPermission()
         val enabled = grayscaleStore.enabled
+        val paused = enabled && pauseStore.isGrayscalePaused(System.currentTimeMillis())
         updatingSwitchFromCode = true
-        binding.grayscaleSwitch.isChecked = enabled
+        binding.grayscaleSwitch.isChecked = enabled && !paused
         updatingSwitchFromCode = false
-        binding.grayscaleStatusText.text = getString(
-            when {
-                enabled && hasSecureSettings -> R.string.grayscale_on
-                enabled -> R.string.grayscale_needs_setup
-                else -> R.string.grayscale_off
-            }
-        )
+        binding.grayscaleStatusText.text = when {
+            paused -> getString(
+                R.string.grayscale_paused,
+                formatPauseEnd(pauseStore.grayscalePausedUntil),
+            )
+            enabled && hasSecureSettings -> getString(R.string.grayscale_on)
+            enabled -> getString(R.string.grayscale_needs_setup)
+            else -> getString(R.string.grayscale_off)
+        }
         binding.grayscaleSetupButton.visibility =
             if (hasSecureSettings) android.view.View.GONE else android.view.View.VISIBLE
         binding.colorAppsSubtitle.text = describeColorApps()
@@ -648,6 +665,7 @@ class MainActivity : AppCompatActivity() {
         requestBatteryOptimizationExemption()
 
         appStatePrefs.edit().putBoolean("service_enabled", true).apply()
+        pauseStore.clearProtection()
 
         val intent = Intent(this, RedirectorService::class.java)
         startForegroundService(intent)
@@ -661,6 +679,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopRedirectorService() {
         appStatePrefs.edit().putBoolean("service_enabled", false).apply()
+        pauseStore.clearProtection()
 
         // Grayscale mode still needs the foreground monitor; only tear the
         // service down when nothing depends on it anymore.
@@ -685,6 +704,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun enableGrayscale() {
         grayscaleStore.enabled = true
+        pauseStore.clearGrayscale()
         // Instant feedback while the service spins up: we are the foreground app,
         // so apply whatever the policy says for ourselves.
         grayscaleController.apply(
@@ -706,6 +726,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun disableGrayscale() {
+        pauseStore.clearGrayscale()
         if (!grayscaleStore.enabled) return
         grayscaleStore.enabled = false
         grayscaleController.release()
@@ -716,6 +737,65 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, R.string.grayscale_stopped, Toast.LENGTH_SHORT).show()
         updatePermissionUI()
     }
+
+    // --- Timed pause ---
+
+    private enum class PauseTarget { PROTECTION, GRAYSCALE }
+
+    // Switching off offers a pause first: the feature stays enabled underneath and
+    // the service turns it back on when the time is up. A real "off" is still there,
+    // one step further away.
+    private fun showPauseDialog(target: PauseTarget) {
+        val options = arrayOf(
+            getString(R.string.pause_15_minutes),
+            getString(R.string.pause_1_hour),
+            getString(R.string.pause_until_morning),
+        )
+        AlertDialog.Builder(this)
+            .setTitle(
+                if (target == PauseTarget.PROTECTION) R.string.pause_protection_title
+                else R.string.pause_grayscale_title
+            )
+            .setItems(options) { _, which ->
+                val now = System.currentTimeMillis()
+                val until = when (which) {
+                    0 -> PausePolicy.endAfterMinutes(now, 15)
+                    1 -> PausePolicy.endAfterMinutes(now, 60)
+                    else -> PausePolicy.nextMorning(LocalDateTime.now())
+                        .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                }
+                startPause(target, until)
+            }
+            .setNeutralButton(R.string.pause_turn_off_completely) { _, _ ->
+                if (target == PauseTarget.PROTECTION) stopRedirectorService()
+                else disableGrayscale()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            // Cancel or back: nothing changed, so the switch goes back on.
+            .setOnDismissListener { updatePermissionUI() }
+            .show()
+    }
+
+    private fun startPause(target: PauseTarget, until: Long) {
+        when (target) {
+            PauseTarget.PROTECTION -> pauseStore.protectionPausedUntil = until
+            PauseTarget.GRAYSCALE -> {
+                pauseStore.grayscalePausedUntil = until
+                // Color back now instead of on the service's next tick.
+                grayscaleController.apply(false)
+            }
+        }
+        Toast.makeText(
+            this,
+            getString(R.string.pause_started, formatPauseEnd(until)),
+            Toast.LENGTH_SHORT,
+        ).show()
+        updatePermissionUI()
+    }
+
+    private fun formatPauseEnd(epochMillis: Long): String = PausePolicy.formatEnd(
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneId.systemDefault()),
+    )
 
     private fun startMonitoringService() {
         requestBatteryOptimizationExemption()
